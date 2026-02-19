@@ -20,8 +20,13 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 3. Fonction pour vérifier l'existence d'une table (pour les tests)
+-- Correction: Ajouter search_path pour sécurité
 CREATE OR REPLACE FUNCTION check_table_exists(table_name TEXT)
-RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
     RETURN EXISTS (
         SELECT FROM information_schema.tables 
@@ -29,7 +34,7 @@ BEGIN
         AND table_name = check_table_exists.table_name
     );
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- 4. Créer un bucket de stockage pour les uploads
 -- (À faire via l'interface Supabase ou l'API)
@@ -53,14 +58,19 @@ $$ LANGUAGE plpgsql;
 -- CREATE INDEX IF NOT EXISTS idx_reservations_proprietaire ON reservations(proprietaire_id);
 
 -- 7. Fonction pour incrémenter les vues d'une annonce
+-- Correction: Ajouter search_path pour sécurité
 CREATE OR REPLACE FUNCTION increment_annonce_views(annonce_id UUID)
-RETURNS VOID AS $$
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
     UPDATE annonces 
     SET nombre_vues = nombre_vues + 1 
     WHERE id = annonce_id;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- Message de confirmation
 DO $$
