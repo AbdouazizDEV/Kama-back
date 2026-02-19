@@ -6,7 +6,7 @@ import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';
 import { ApiError } from '@/shared/utils/ApiError';
 import { logger } from '@/shared/utils/logger';
-import { supabase } from '@/config/supabase.config';
+import { supabase, supabaseAdmin } from '@/config/supabase.config';
 
 const verifyEmailSchema = z.object({
   token: z.string().optional(), // Token OTP (ancienne méthode)
@@ -25,51 +25,62 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Cas 1: Vérification via access_token (redirection Supabase)
     if (data.accessToken) {
       try {
-        // Créer un client Supabase avec le token pour vérifier
-        const { createClient } = await import('@supabase/supabase-js');
-        const { env } = await import('@/config/env.config');
-        
-        const tempClient = createClient(env.supabase.url, env.supabase.anonKey, {
-          global: {
-            headers: {
-              Authorization: `Bearer ${data.accessToken}`,
-            },
-          },
-        });
-
-        const { data: userData, error: tokenError } = await tempClient.auth.getUser();
-
-        if (tokenError) {
-          logger.error('Erreur lors de la vérification du token:', tokenError);
-          throw ApiError.badRequest(`Token d'accès invalide ou expiré: ${tokenError.message}`);
+        // Décoder le JWT pour obtenir l'ID utilisateur
+        const tokenParts = data.accessToken.split('.');
+        if (tokenParts.length !== 3) {
+          throw ApiError.badRequest('Format de token invalide');
         }
 
-        if (!userData.user) {
-          throw ApiError.badRequest('Token d\'accès invalide ou expiré');
+        // Décoder le payload (base64url)
+        const payload = JSON.parse(
+          Buffer.from(tokenParts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString()
+        );
+
+        const userId = payload.sub;
+        if (!userId) {
+          throw ApiError.badRequest('Token invalide: ID utilisateur manquant');
         }
 
-        user = userData.user;
+        // Vérifier l'expiration
+        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+          throw ApiError.badRequest('Token expiré');
+        }
 
-        // Vérifier si l'email est déjà vérifié
-        if (user.email_confirmed_at) {
-          verified = true;
-          // Mettre à jour le statut dans notre table
-          try {
-            await authService.updateUserVerificationStatus(user.id, true);
-            logger.info(`Email déjà vérifié pour l'utilisateur: ${user.id}`);
-          } catch (dbError: any) {
-            logger.warn(`Erreur lors de la mise à jour du statut (non bloquant): ${dbError.message}`);
-            // Ne pas bloquer si l'utilisateur n'existe pas encore dans notre table
-          }
-        } else {
+        // Vérifier que l'email est vérifié dans le token
+        const emailVerified = payload.user_metadata?.email_verified || payload.email_verified;
+        if (!emailVerified) {
           throw ApiError.badRequest('L\'email n\'a pas encore été vérifié');
+        }
+
+        // Récupérer l'utilisateur via l'API admin
+        const { data: adminUser, error: adminError } = await supabaseAdmin.auth.admin.getUserById(userId);
+
+        if (adminError || !adminUser.user) {
+          logger.error('Erreur lors de la récupération de l\'utilisateur:', adminError);
+          throw ApiError.badRequest(`Erreur lors de la vérification: ${adminError?.message || 'Utilisateur introuvable'}`);
+        }
+
+        user = adminUser.user;
+        verified = true;
+
+        // Mettre à jour le statut dans notre table
+        try {
+          await authService.updateUserVerificationStatus(user.id, true);
+          logger.info(`Statut de vérification mis à jour pour l'utilisateur: ${user.id}`);
+        } catch (dbError: any) {
+          logger.warn(`Erreur lors de la mise à jour du statut (non bloquant): ${dbError.message}`);
+          // Ne pas bloquer si l'utilisateur n'existe pas encore dans notre table
         }
       } catch (error: any) {
         if (error instanceof ApiError) {
           throw error;
         }
-        logger.error('Erreur lors de la vérification via access_token:', error);
-        throw ApiError.badRequest(`Erreur lors de la vérification: ${error.message || 'Erreur inconnue'}`);
+        logger.error('Erreur lors de la vérification via access_token:', {
+          message: error?.message,
+          stack: error?.stack,
+          error: error,
+        });
+        throw ApiError.badRequest(`Erreur lors de la vérification: ${error?.message || 'Erreur inconnue'}`);
       }
     }
     // Cas 2: Vérification via token OTP (ancienne méthode)
