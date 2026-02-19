@@ -24,7 +24,7 @@ export const env = {
   // Email
   email: {
     sendgridApiKey: process.env.SENDGRID_API_KEY!,
-    fromEmail: process.env.SENDGRID_FROM_EMAIL || 'noreply@locagabon.com',
+    fromEmail: process.env.SENDGRID_FROM_EMAIL || 'noreply@kama.com',
   },
   // Payment
   payment: {

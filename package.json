@@ -14,7 +14,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "db:check": "ts-node scripts/check-db-connection.ts"
+    "db:check": "ts-node scripts/check-db-connection.ts",
+    "env:check": "ts-node scripts/check-env.ts"
   },
   "dependencies": {
     "next": "^14.2.0",
@@ -29,7 +30,8 @@
     "swagger-ui-react": "^5.10.5",
     "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
