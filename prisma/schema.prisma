@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  nom             String
+  prenom          String
+  telephone       String
+  photoProfil     String?
+  typeUtilisateur String   // LOCATAIRE, PROPRIETAIRE, ETUDIANT, ADMIN
+  estActif        Boolean  @default(true)
+  estVerifie      Boolean  @default(false)
+  dateInscription DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  annoncesProprietaire Annonce[]     @relation("ProprietaireAnnonces")
+  reservationsLocataire Reservation[] @relation("LocataireReservations")
+  reservationsProprietaire Reservation[] @relation("ProprietaireReservations")
+  paiementsLocataire     Paiement[]   @relation("LocatairePaiements")
+  paiementsProprietaire  Paiement[]   @relation("ProprietairePaiements")
+  messagesExpediteur     Message[]    @relation("ExpediteurMessages")
+  messagesDestinataire   Message[]    @relation("DestinataireMessages")
+
+  @@map("users")
+}
+
+model Annonce {
+  id                String   @id @default(uuid())
+  proprietaireId    String
+  titre             String
+  description       String   @db.Text
+  typeBien          String   // APPARTEMENT, MAISON, TERRAIN, VEHICULE
+  categorieBien     String
+  prix              Decimal  @db.Decimal(10, 2)
+  caution           Decimal  @db.Decimal(10, 2)
+  ville             String
+  quartier          String
+  adresseComplete   String
+  latitude          Float?
+  longitude         Float?
+  superficie        Float?
+  nombrePieces      Int?
+  estMeuble         Boolean  @default(false)
+  equipements       String[] @default([])
+  photos            String[] @default([])
+  estDisponible     Boolean  @default(false)
+  dateDisponibilite DateTime
+  dateCreation      DateTime  @default(now())
+  dateModification  DateTime  @updatedAt
+  nombreVues        Int      @default(0)
+  statutModeration  String   @default("EN_ATTENTE") // EN_ATTENTE, APPROUVE, REJETE
+
+  // Relations
+  proprietaire  User          @relation("ProprietaireAnnonces", fields: [proprietaireId], references: [id])
+  reservations  Reservation[]
+  favoris       Favori[]
+
+  @@map("annonces")
+}
+
+model Reservation {
+  id              String   @id @default(uuid())
+  annonceId       String
+  locataireId     String
+  proprietaireId  String
+  dateDebut       DateTime
+  dateFin         DateTime
+  nombrePersonnes Int
+  prixTotal       Decimal  @db.Decimal(10, 2)
+  caution         Decimal  @db.Decimal(10, 2)
+  message         String?  @db.Text
+  dateCreation    DateTime  @default(now())
+  dateModification DateTime @updatedAt
+  statut          String   @default("EN_ATTENTE") // EN_ATTENTE, ACCEPTEE, REJETEE, ANNULEE, TERMINEE
+
+  // Relations
+  annonce      Annonce   @relation(fields: [annonceId], references: [id])
+  locataire    User      @relation("LocataireReservations", fields: [locataireId], references: [id])
+  proprietaire User      @relation("ProprietaireReservations", fields: [proprietaireId], references: [id])
+  paiements    Paiement[]
+  messages     Message[]
+
+  @@map("reservations")
+}
+
+model Paiement {
+  id                  String   @id @default(uuid())
+  reservationId       String
+  locataireId         String
+  proprietaireId      String
+  montant             Decimal  @db.Decimal(10, 2)
+  methodePaiement     String   // AIRTEL_MONEY, MOOV_MONEY, STRIPE, ESPECE
+  dateCreation        DateTime  @default(now())
+  dateModification    DateTime  @updatedAt
+  statut              String   @default("EN_ATTENTE") // EN_ATTENTE, VALIDE, ECHOUE, REMBOURSE
+  referenceTransaction String?
+  dateValidation      DateTime?
+  motifEchec          String?  @db.Text
+
+  // Relations
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+  locataire    User        @relation("LocatairePaiements", fields: [locataireId], references: [id])
+  proprietaire User        @relation("ProprietairePaiements", fields: [proprietaireId], references: [id])
+
+  @@map("paiements")
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  reservationId String
+  expediteurId  String
+  destinataireId String
+  contenu       String   @db.Text
+  dateEnvoi     DateTime  @default(now())
+  estLu         Boolean   @default(false)
+  dateLecture   DateTime?
+
+  // Relations
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+  expediteur   User        @relation("ExpediteurMessages", fields: [expediteurId], references: [id])
+  destinataire User        @relation("DestinataireMessages", fields: [destinataireId], references: [id])
+
+  @@map("messages")
+}
+
+model Favori {
+  id        String   @id @default(uuid())
+  userId    String
+  annonceId String
+  dateAjout DateTime @default(now())
+
+  // Relations
+  annonce Annonce @relation(fields: [annonceId], references: [id])
+
+  @@unique([userId, annonceId])
+  @@map("favoris")
+}
