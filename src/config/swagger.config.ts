@@ -82,7 +82,10 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ['./src/docs/swagger/*.ts'], // Fichiers contenant la documentation
+  apis: [
+    './src/docs/swagger/*.ts', // Fichiers contenant la documentation
+    './src/app/api/**/*.ts', // Route handlers pour auto-documentation
+  ],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

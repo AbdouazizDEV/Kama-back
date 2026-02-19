@@ -24,16 +24,31 @@ export async function authMiddleware(
 
   try {
     const authService = new SupabaseAuthService();
-    const decoded = await authService.verifyToken(token);
+    const { user, error } = await authService.verifyAccessToken(token);
+
+    if (error || !user) {
+      throw ApiError.unauthorized('Token invalide ou expiré');
+    }
+
+    // Récupérer le type utilisateur depuis la table users
+    const { supabaseAdmin } = await import('@/config/supabase.config');
+    const { data: userData } = await supabaseAdmin
+      .from('users')
+      .select('type_utilisateur')
+      .eq('id', user.id)
+      .single();
 
     (request as AuthenticatedRequest).user = {
-      id: decoded.userId,
-      email: decoded.email,
-      typeUtilisateur: decoded.typeUtilisateur,
+      id: user.id,
+      email: user.email || '',
+      typeUtilisateur: userData?.type_utilisateur || 'LOCATAIRE',
     };
 
     return request as AuthenticatedRequest;
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     throw ApiError.unauthorized('Token invalide ou expiré');
   }
 }
