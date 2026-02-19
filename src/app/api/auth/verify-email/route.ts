@@ -24,22 +24,52 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Cas 1: Vérification via access_token (redirection Supabase)
     if (data.accessToken) {
-      const { data: userData, error: tokenError } = await supabase.auth.getUser(data.accessToken);
+      try {
+        // Créer un client Supabase avec le token pour vérifier
+        const { createClient } = await import('@supabase/supabase-js');
+        const { env } = await import('@/config/env.config');
+        
+        const tempClient = createClient(env.supabase.url, env.supabase.anonKey, {
+          global: {
+            headers: {
+              Authorization: `Bearer ${data.accessToken}`,
+            },
+          },
+        });
 
-      if (tokenError || !userData.user) {
-        throw ApiError.badRequest('Token d\'accès invalide ou expiré');
-      }
+        const { data: userData, error: tokenError } = await tempClient.auth.getUser();
 
-      user = userData.user;
+        if (tokenError) {
+          logger.error('Erreur lors de la vérification du token:', tokenError);
+          throw ApiError.badRequest(`Token d'accès invalide ou expiré: ${tokenError.message}`);
+        }
 
-      // Vérifier si l'email est déjà vérifié
-      if (user.email_confirmed_at) {
-        verified = true;
-        // Mettre à jour le statut dans notre table
-        await authService.updateUserVerificationStatus(user.id, true);
-        logger.info(`Email déjà vérifié pour l'utilisateur: ${user.id}`);
-      } else {
-        throw ApiError.badRequest('L\'email n\'a pas encore été vérifié');
+        if (!userData.user) {
+          throw ApiError.badRequest('Token d\'accès invalide ou expiré');
+        }
+
+        user = userData.user;
+
+        // Vérifier si l'email est déjà vérifié
+        if (user.email_confirmed_at) {
+          verified = true;
+          // Mettre à jour le statut dans notre table
+          try {
+            await authService.updateUserVerificationStatus(user.id, true);
+            logger.info(`Email déjà vérifié pour l'utilisateur: ${user.id}`);
+          } catch (dbError: any) {
+            logger.warn(`Erreur lors de la mise à jour du statut (non bloquant): ${dbError.message}`);
+            // Ne pas bloquer si l'utilisateur n'existe pas encore dans notre table
+          }
+        } else {
+          throw ApiError.badRequest('L\'email n\'a pas encore été vérifié');
+        }
+      } catch (error: any) {
+        if (error instanceof ApiError) {
+          throw error;
+        }
+        logger.error('Erreur lors de la vérification via access_token:', error);
+        throw ApiError.badRequest(`Erreur lors de la vérification: ${error.message || 'Erreur inconnue'}`);
       }
     }
     // Cas 2: Vérification via token OTP (ancienne méthode)
