@@ -52,12 +52,15 @@
  *
  *     VerifyEmailRequest:
  *       type: object
- *       required:
- *         - token
  *       properties:
  *         token:
  *           type: string
+ *           description: Token OTP (ancienne méthode)
  *           example: "abc123def456..."
+ *         accessToken:
+ *           type: string
+ *           description: Access token depuis la redirection Supabase (recommandé)
+ *           example: "eyJhbGciOiJFUzI1NiIsImtpZCI6..."
  *         type:
  *           type: string
  *           enum: [email, signup, recovery]
