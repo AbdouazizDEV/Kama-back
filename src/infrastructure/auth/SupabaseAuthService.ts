@@ -1,6 +1,8 @@
 import { supabase, supabaseAdmin } from '@/config/supabase.config';
 import type { AuthError, Session, User as SupabaseUser } from '@supabase/supabase-js';
 
+// Note: Les types sont importés depuis @supabase/supabase-js
+
 export interface AuthResponse {
   user: SupabaseUser | null;
   session: Session | null;
