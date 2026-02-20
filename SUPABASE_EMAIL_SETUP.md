@@ -1,60 +1,99 @@
-# 📧 Configuration Email Supabase - Guide Complet
+# 📧 Configuration Email avec Supabase
 
-## 🔍 Problème : Les emails ne sont pas reçus
+Ce guide explique comment configurer l'envoi d'emails avec Supabase pour remplacer SendGrid.
 
-Si vous ne recevez pas les emails de vérification, voici les étapes pour résoudre le problème.
+## 🎯 Architecture
 
-## ✅ Étape 1: Vérifier la Configuration Email dans Supabase
+- **Emails d'authentification** : Utilise Supabase Auth directement (vérification, reset password)
+- **Emails personnalisés** : Utilise Supabase Edge Functions avec Resend (contact, newsletter, réservation)
 
-### 1.1 Aller dans Authentication > Email Templates
+## ✅ Étape 1: Configurer SMTP dans Supabase
 
-1. Dans votre dashboard Supabase, allez dans **Authentication** > **Email Templates**
-2. Vérifiez que les templates sont activés :
-   - ✅ **Confirm signup** - Template pour la vérification d'email
-   - ✅ **Reset password** - Template pour la réinitialisation
+### 1.1 Aller dans Authentication > Paramètres SMTP
 
-### 1.2 Vérifier les Paramètres SMTP
+1. Dans votre dashboard Supabase, allez dans **Authentication** > **E-mails** > **Paramètres SMTP**
+2. Cliquez sur **"Configurer SMTP"**
 
-1. Allez dans **Settings** > **Auth**
-2. Vérifiez la section **SMTP Settings**
+### 1.2 Options de Configuration
 
-**Options :**
+#### Option A: Utiliser le service intégré Supabase (Gratuit, limité)
+- ✅ Déjà activé par défaut
+- ⚠️ **Limite** : 3 emails/heure en plan gratuit
+- ✅ Fonctionne pour les emails d'authentification
 
-#### Option A: Utiliser Supabase Email (Gratuit, limité)
+#### Option B: Configurer un SMTP personnalisé (Recommandé)
 
-- Par défaut, Supabase envoie les emails via son propre service
-- **Limite** : 3 emails/heure en plan gratuit
-- **Vérifiez** : Que "Enable email confirmations" est activé
+Vous pouvez configurer un SMTP avec :
+- **Resend** (Recommandé - gratuit jusqu'à 3000 emails/mois)
+- **SendGrid** (Gratuit jusqu'à 100 emails/jour)
+- **Mailgun** (Gratuit jusqu'à 5000 emails/mois)
+- **AWS SES** (Payant mais très économique)
 
-#### Option B: Configurer un SMTP personnalisé (Recommandé pour production)
-
-1. Cliquez sur **"Use custom SMTP"**
-2. Configurez avec un service comme :
-   - **SendGrid**
-   - **Mailgun**
-   - **AWS SES**
-   - **Gmail SMTP** (pour tests)
-
-**Exemple avec SendGrid :**
+**Exemple avec Resend :**
 ```
-SMTP Host: smtp.sendgrid.net
+SMTP Host: smtp.resend.com
 SMTP Port: 587
-SMTP User: apikey
-SMTP Pass: VOTRE_SENDGRID_API_KEY
+SMTP User: resend
+SMTP Pass: re_xxxxxxxxxxxxx (votre clé API Resend)
 Sender email: noreply@kama.com
 Sender name: Kama
 ```
 
-## ✅ Étape 2: Activer la Vérification d'Email
+## ✅ Étape 2: Créer la Edge Function pour les emails personnalisés
 
-1. Allez dans **Authentication** > **Settings**
-2. Vérifiez que :
-   - ✅ **Enable email confirmations** est activé
-   - ✅ **Secure email change** est activé (optionnel)
+### 2.1 Installer Supabase CLI
 
-## ✅ Étape 3: Vérifier les URLs de Redirection
+```bash
+npm install -g supabase
+```
 
-1. Allez dans **Authentication** > **URL Configuration**
+### 2.2 Se connecter à Supabase
+
+```bash
+supabase login
+```
+
+### 2.3 Lier le projet
+
+```bash
+supabase link --project-ref hzeiyyzopquxmgxpuhpo
+```
+
+### 2.4 Créer la fonction
+
+```bash
+supabase functions new send-email
+```
+
+### 2.5 Configurer Resend (Optionnel mais recommandé)
+
+1. Créez un compte sur [Resend](https://resend.com)
+2. Obtenez votre clé API
+3. Ajoutez-la dans Supabase Dashboard > Edge Functions > Secrets :
+
+```bash
+supabase secrets set RESEND_API_KEY=re_xxxxxxxxxxxxx
+```
+
+### 2.6 Déployer la fonction
+
+```bash
+supabase functions deploy send-email
+```
+
+## ✅ Étape 3: Vérifier la Configuration
+
+### 3.1 Vérifier les templates d'email
+
+1. Allez dans **Authentication** > **E-mails** > **Modèles**
+2. Vérifiez que les templates sont activés :
+   - ✅ **Confirmer l'inscription**
+   - ✅ **Réinitialiser le mot de passe**
+   - ✅ **Lien magique**
+
+### 3.2 Vérifier les URLs de redirection
+
+1. Allez dans **Authentication** > **Configuration de l'URL**
 2. Configurez :
    - **Site URL**: `http://localhost:3001` (votre frontend)
    - **Redirect URLs**: 
@@ -64,99 +103,58 @@ Sender name: Kama
      http://localhost:3001/auth/reset-password
      ```
 
-## ✅ Étape 4: Activer la Protection contre les Mots de Passe Compromis
+## ✅ Étape 4: Tester
 
-D'après l'avertissement que vous avez vu :
-
-1. Allez dans **Authentication** > **Settings**
-2. Activez **"Enable leaked password protection"**
-3. Cela vérifie les mots de passe contre HaveIBeenPwned.org
-
-## ✅ Étape 5: Tester l'Envoi d'Email
-
-### Test via l'API Supabase
+### 4.1 Tester l'email de vérification
 
 ```bash
-# Tester l'envoi d'un email de vérification
-curl -X POST 'https://hzeiyyzopquxmgxpuhpo.supabase.co/auth/v1/resend' \
-  -H "apikey: VOTRE_ANON_KEY" \
-  -H "Content-Type: application/json" \
+curl -X POST http://localhost:3000/api/auth/test-email \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"abdouazizdiop583@gmail.com"}'
+```
+
+### 4.2 Tester l'email de contact
+
+```bash
+curl -X POST http://localhost:3000/api/public/contact \
+  -H 'Content-Type: application/json' \
   -d '{
-    "type": "signup",
-    "email": "aadiop@dizigroup.net"
+    "nom":"Test",
+    "email":"abdouazizdiop583@gmail.com",
+    "sujet":"Test",
+    "message":"Message test"
   }'
 ```
 
-### Vérifier les Logs
+## 🔧 Configuration Alternative: Sans Edge Function
 
-1. Allez dans **Logs** > **Auth Logs**
-2. Vérifiez si des emails ont été envoyés
-3. Vérifiez s'il y a des erreurs
+Si vous ne voulez pas utiliser Edge Functions, vous pouvez :
 
-## 🐛 Dépannage
+1. **Configurer SMTP personnalisé dans Supabase** (voir Étape 1.2)
+2. **Modifier `SupabaseEmailService.ts`** pour utiliser directement le SMTP configuré
 
-### Problème: "Email not sent"
+Cependant, Supabase n'a pas d'API directe pour les emails personnalisés, donc vous devrez :
+- Soit utiliser Edge Functions
+- Soit garder SendGrid/Resend pour les emails personnalisés
+- Soit créer un service email séparé
 
-**Solutions :**
-1. Vérifiez que vous n'avez pas dépassé la limite (3/heure en gratuit)
-2. Vérifiez les logs dans Supabase
-3. Vérifiez que l'email n'est pas dans les spams
-4. Utilisez un SMTP personnalisé
+## 📝 Variables d'environnement
 
-### Problème: "SMTP configuration error"
+Vous n'avez plus besoin de :
+- `SENDGRID_API_KEY`
+- `SENDGRID_FROM_EMAIL`
 
-**Solutions :**
-1. Vérifiez les identifiants SMTP
-2. Vérifiez que le port est correct (587 pour TLS, 465 pour SSL)
-3. Vérifiez que le firewall n'bloque pas
+Les emails d'authentification utilisent directement Supabase Auth.
 
-### Problème: Emails dans les spams
+## ⚠️ Limitations
 
-**Solutions :**
-1. Configurez SPF, DKIM, DMARC pour votre domaine
-2. Utilisez un service email professionnel (SendGrid, Mailgun)
-3. Vérifiez la réputation de votre domaine
+1. **Plan Gratuit Supabase** : 3 emails/heure pour le service intégré
+2. **Pour la production** : Configurez un SMTP personnalisé ou utilisez Edge Functions avec Resend
+3. **Emails personnalisés** : Nécessitent Edge Functions ou un service externe
 
-## 📝 Configuration Recommandée pour Production
+## 🎉 Avantages
 
-```env
-# Dans Supabase Dashboard > Settings > Auth > SMTP Settings
-
-SMTP Host: smtp.sendgrid.net
-SMTP Port: 587
-SMTP User: apikey
-SMTP Pass: SG.xxxxxxxxxxxxx (votre clé SendGrid)
-Sender email: noreply@kama.com
-Sender name: Kama Platform
-```
-
-## 🔧 Script de Test
-
-Créez un script pour tester l'envoi d'email :
-
-```typescript
-// scripts/test-email.ts
-import { supabase } from '../src/config/supabase.config';
-
-async function testEmail() {
-  const { data, error } = await supabase.auth.resend({
-    type: 'signup',
-    email: 'aadiop@dizigroup.net',
-  });
-
-  if (error) {
-    console.error('Erreur:', error);
-  } else {
-    console.log('Email envoyé avec succès');
-  }
-}
-
-testEmail();
-```
-
-## ⚠️ Notes Importantes
-
-1. **Plan Gratuit Supabase** : Limite de 3 emails/heure
-2. **Pour la production** : Utilisez un SMTP personnalisé
-3. **Vérifiez toujours les spams** avant de déclarer un problème
-4. **Les emails peuvent prendre quelques minutes** à arriver
+✅ Pas besoin de SendGrid  
+✅ Emails d'authentification gérés automatiquement  
+✅ Configuration centralisée dans Supabase  
+✅ Gratuit jusqu'à 3000 emails/mois avec Resend  

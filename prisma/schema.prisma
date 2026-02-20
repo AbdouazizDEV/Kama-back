@@ -36,6 +36,8 @@ model User {
   paiementsProprietaire  Paiement[]   @relation("ProprietairePaiements")
   messagesExpediteur     Message[]    @relation("ExpediteurMessages")
   messagesDestinataire   Message[]    @relation("DestinataireMessages")
+  avisLocataire          Avis[]       @relation("LocataireAvis")
+  avisProprietaire       Avis[]       @relation("ProprietaireAvis")
 
   @@map("users")
 }
@@ -95,6 +97,7 @@ model Reservation {
   proprietaire User      @relation("ProprietaireReservations", fields: [proprietaireId], references: [id])
   paiements    Paiement[]
   messages     Message[]
+  avis         Avis[]
 
   @@map("reservations")
 }
@@ -161,4 +164,23 @@ model Favori {
 
   @@unique([userId, annonceId])
   @@map("favoris")
+}
+
+model Avis {
+  id            String   @id @default(uuid())
+  reservationId String
+  locataireId   String
+  proprietaireId String
+  note          Int      // 1-5
+  commentaire   String   @db.Text
+  dateCreation  DateTime @default(now())
+  dateModification DateTime @updatedAt
+
+  // Relations
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+  locataire   User        @relation("LocataireAvis", fields: [locataireId], references: [id])
+  proprietaire User       @relation("ProprietaireAvis", fields: [proprietaireId], references: [id])
+
+  @@unique([reservationId, locataireId])
+  @@map("avis")
 }

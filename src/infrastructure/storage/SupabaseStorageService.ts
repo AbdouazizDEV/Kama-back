@@ -99,7 +99,56 @@ export class SupabaseStorageService implements IStorageService {
   }
 
   /**
-   * Supprime un fichier
+   * Upload un avatar utilisateur
+   */
+  async uploadAvatar(file: Buffer, fileName: string, userId: string): Promise<string> {
+    const fileExt = fileName.split('.').pop()?.toLowerCase() || '';
+    if (!this.isImageFile(fileExt)) {
+      throw new Error('Le fichier doit être une image');
+    }
+
+    const filePath = `avatars/${userId}/${randomUUID()}.${fileExt}`;
+
+    const { data, error } = await supabaseAdmin.storage
+      .from(StorageBucket.USER_AVATARS)
+      .upload(filePath, file, {
+        contentType: this.getContentType(fileExt),
+        upsert: false,
+        cacheControl: '3600',
+      });
+
+    if (error) {
+      throw new Error(`Erreur lors de l'upload de l'avatar: ${error.message}`);
+    }
+
+    return this.getFileUrl(data.path, StorageBucket.USER_AVATARS);
+  }
+
+  /**
+   * Upload un document
+   */
+  async uploadDocument(file: Buffer, fileName: string, userId: string): Promise<string> {
+    const fileExt = fileName.split('.').pop()?.toLowerCase() || '';
+
+    const filePath = `documents/${userId}/${randomUUID()}.${fileExt}`;
+
+    const { data, error } = await supabaseAdmin.storage
+      .from(StorageBucket.DOCUMENTS)
+      .upload(filePath, file, {
+        contentType: this.getContentType(fileExt),
+        upsert: false,
+        cacheControl: '3600',
+      });
+
+    if (error) {
+      throw new Error(`Erreur lors de l'upload du document: ${error.message}`);
+    }
+
+    return this.getFileUrl(data.path, StorageBucket.DOCUMENTS);
+  }
+
+  /**
+   * Supprime un fichier depuis son URL
    */
   async deleteFile(fileUrl: string): Promise<void> {
     // Essayer de détecter le bucket depuis l'URL
@@ -126,6 +175,17 @@ export class SupabaseStorageService implements IStorageService {
       throw new Error('URL de fichier invalide ou bucket non reconnu');
     }
 
+    const { error } = await supabaseAdmin.storage.from(bucket).remove([filePath]);
+
+    if (error) {
+      throw new Error(`Erreur lors de la suppression: ${error.message}`);
+    }
+  }
+
+  /**
+   * Supprime un fichier depuis son chemin et bucket
+   */
+  async deleteFileByPath(bucket: StorageBucket, filePath: string): Promise<void> {
     const { error } = await supabaseAdmin.storage.from(bucket).remove([filePath]);
 
     if (error) {
