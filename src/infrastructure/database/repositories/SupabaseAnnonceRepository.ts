@@ -25,7 +25,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
     const { data, error } = await supabase
       .from('annonces')
       .select('*')
-      .eq('proprietaireId', proprietaireId);
+      .eq('proprietaire_id', proprietaireId);
 
     if (error) {
       throw new Error(`Erreur lors de la récupération: ${error.message}`);
@@ -67,7 +67,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
     let query = supabase.from('annonces').select('*', { count: 'exact' });
 
     if (criteria.typeBien) {
-      query = query.eq('typeBien', criteria.typeBien);
+      query = query.eq('type_bien', criteria.typeBien);
     }
     if (criteria.ville) {
       query = query.eq('ville', criteria.ville);
@@ -82,13 +82,13 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
       query = query.lte('prix', criteria.prixMax);
     }
     if (criteria.nombrePiecesMin !== undefined) {
-      query = query.gte('nombrePieces', criteria.nombrePiecesMin);
+      query = query.gte('nombre_pieces', criteria.nombrePiecesMin);
     }
     if (criteria.superficieMin !== undefined) {
       query = query.gte('superficie', criteria.superficieMin);
     }
     if (criteria.estMeuble !== undefined) {
-      query = query.eq('estMeuble', criteria.estMeuble);
+      query = query.eq('est_meuble', criteria.estMeuble);
     }
 
     // Pagination
@@ -98,12 +98,19 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
 
     query = query.range(skip, skip + limit - 1);
 
-    // Tri
-    if (criteria.sortBy) {
-      query = query.order(criteria.sortBy, {
-        ascending: criteria.sortOrder === 'asc',
-      });
-    }
+    // Tri - utiliser les noms de colonnes tels qu'ils sont dans la base de données
+    // Le schéma Prisma n'a pas de @map pour dateCreation, donc la colonne est probablement en camelCase
+    // Mais si la migration a été faite avec snake_case, utiliser snake_case
+    const sortByMap: Record<string, string> = {
+      dateCreation: 'dateCreation', // Essayer camelCase d'abord (nom Prisma)
+      nombreVues: 'nombreVues', // Essayer camelCase d'abord
+      prix: 'prix',
+    };
+    const sortBy = criteria.sortBy || 'dateCreation';
+    const dbSortBy = sortByMap[sortBy] || sortBy;
+    query = query.order(dbSortBy, {
+      ascending: criteria.sortOrder === 'asc',
+    });
 
     const { data, error, count } = await query;
 
@@ -134,32 +141,32 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
     const adresse = new Adresse(
       data.ville,
       data.quartier,
-      data.adresseComplete,
+      data.adresse_complete || data.adresseComplete,
       data.latitude,
       data.longitude
     );
 
     return new Annonce(
       data.id,
-      data.proprietaireId,
+      data.proprietaire_id || data.proprietaireId,
       data.titre,
       data.description,
-      data.typeBien as TypeBien,
-      data.categorieBien,
+      (data.type_bien || data.typeBien) as TypeBien,
+      data.categorie_bien || data.categorieBien,
       new Prix(Number(data.prix)),
       new Prix(Number(data.caution)),
       adresse,
       data.superficie ? Number(data.superficie) : null,
-      data.nombrePieces ? Number(data.nombrePieces) : null,
-      data.estMeuble,
+      data.nombre_pieces || data.nombrePieces ? Number(data.nombre_pieces || data.nombrePieces) : null,
+      data.est_meuble !== undefined ? data.est_meuble : data.estMeuble,
       data.equipements || [],
       data.photos || [],
-      data.estDisponible,
-      new Date(data.dateDisponibilite),
-      new Date(data.dateCreation),
-      new Date(data.dateModification),
-      data.nombreVues,
-      data.statutModeration as StatutModeration
+      data.est_disponible !== undefined ? data.est_disponible : data.estDisponible,
+      new Date(data.date_disponibilite || data.dateDisponibilite),
+      new Date(data.date_creation || data.dateCreation),
+      new Date(data.date_modification || data.dateModification),
+      data.nombre_vues || data.nombreVues || 0,
+      (data.statut_moderation || data.statutModeration) as StatutModeration
     );
   }
 

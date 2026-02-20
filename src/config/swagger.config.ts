@@ -80,7 +80,7 @@ const options = {
         },
       },
     },
-    security: [{ bearerAuth: [] }],
+    // Pas de sécurité par défaut - chaque endpoint définit sa propre sécurité
   },
   apis: [
     './src/docs/swagger/*.ts', // Fichiers contenant la documentation

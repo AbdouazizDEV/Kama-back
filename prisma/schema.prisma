@@ -10,6 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Configuration pour le seeding
+// Pour exécuter: npm run db:seed
+
 model User {
   id              String   @id @default(uuid())
   email           String   @unique
@@ -17,13 +20,13 @@ model User {
   nom             String
   prenom          String
   telephone       String
-  photoProfil     String?
-  typeUtilisateur String   // LOCATAIRE, PROPRIETAIRE, ETUDIANT, ADMIN
-  estActif        Boolean  @default(true)
-  estVerifie      Boolean  @default(false)
-  dateInscription DateTime  @default(now())
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  photoProfil     String?  @map("photo_profil")
+  typeUtilisateur String   @map("type_utilisateur") // LOCATAIRE, PROPRIETAIRE, ETUDIANT, ADMIN
+  estActif        Boolean  @default(true) @map("est_actif")
+  estVerifie      Boolean  @default(false) @map("est_verifie")
+  dateInscription DateTime  @default(now()) @map("date_inscription")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
   // Relations
   annoncesProprietaire Annonce[]     @relation("ProprietaireAnnonces")
@@ -134,6 +137,17 @@ model Message {
   destinataire User        @relation("DestinataireMessages", fields: [destinataireId], references: [id])
 
   @@map("messages")
+}
+
+model NewsletterSubscription {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  dateInscription  DateTime  @default(now()) @map("date_inscription")
+  estActif         Boolean   @default(true) @map("est_actif")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@map("newsletter_subscriptions")
 }
 
 model Favori {

@@ -205,6 +205,92 @@
 
 /**
  * @swagger
+ * /api/auth/google:
+ *   get:
+ *     summary: Obtenir l'URL de redirection pour l'authentification Google
+ *     tags: [Authentification]
+ *     parameters:
+ *       - in: query
+ *         name: redirectTo
+ *         schema:
+ *           type: string
+ *           format: uri
+ *         required: false
+ *         description: URL de redirection après authentification (optionnel)
+ *         example: http://localhost:3001/auth/callback
+ *     responses:
+ *       200:
+ *         description: URL d'authentification Google générée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     authUrl:
+ *                       type: string
+ *                       format: uri
+ *                       example: https://hzeiyyzopquxmgxpuhpo.supabase.co/auth/v1/authorize?provider=google&...
+ *                 message:
+ *                   type: string
+ *                   example: URL d'authentification Google générée
+ *       500:
+ *         description: Erreur serveur
+ */
+
+/**
+ * @swagger
+ * /api/auth/google/callback:
+ *   get:
+ *     summary: Callback après authentification Google
+ *     tags: [Authentification]
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Code d'autorisation retourné par Google
+ *       - in: query
+ *         name: error
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Erreur éventuelle retournée par Google
+ *     responses:
+ *       200:
+ *         description: Authentification Google réussie
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/UserResponse'
+ *                     session:
+ *                       $ref: '#/components/schemas/SessionResponse'
+ *                 message:
+ *                   type: string
+ *                   example: Authentification Google réussie
+ *       400:
+ *         description: Code manquant ou erreur d'authentification
+ *       401:
+ *         description: Erreur lors de l'échange du code
+ */
+
+/**
+ * @swagger
  * /api/auth/verify-email:
  *   post:
  *     summary: Vérifier l'email via le token reçu

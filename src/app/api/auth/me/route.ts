@@ -42,9 +42,9 @@ async function handler(request: AuthenticatedRequest): Promise<NextResponse> {
         await authService.createUserInDatabase(
           user.id,
           user.email || request.user.email,
-          metadata.nom || metadata.nom || 'Non défini',
-          metadata.prenom || metadata.prenom || 'Non défini',
-          metadata.telephone || metadata.telephone || '',
+          metadata.nom || 'Non défini',
+          metadata.prenom || 'Non défini',
+          metadata.telephone || '',
           metadata.type_utilisateur || metadata.typeUtilisateur || 'LOCATAIRE'
         );
 

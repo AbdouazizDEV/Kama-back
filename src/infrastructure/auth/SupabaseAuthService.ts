@@ -185,19 +185,30 @@ export class SupabaseAuthService {
     telephone: string,
     typeUtilisateur: string
   ): Promise<void> {
+    // Note: Supabase utilise snake_case, mais nous n'avons pas de colonne password
+    // car Supabase Auth gère les mots de passe. Nous devons créer un mot de passe factice
+    // ou modifier le schéma pour rendre password optionnel.
+    // Pour l'instant, utilisons un hash factice qui sera ignoré.
+    const now = new Date().toISOString();
     const { error } = await supabaseAdmin.from('users').insert({
       id: supabaseUserId,
       email: email.toLowerCase().trim(),
+      password: '$2b$10$PLACEHOLDER_PASSWORD_HASH', // Hash factice, Supabase Auth gère les mots de passe
       nom,
       prenom,
       telephone,
       type_utilisateur: typeUtilisateur,
       est_actif: true,
       est_verifie: false,
-      date_inscription: new Date().toISOString(),
+      updated_at: now,
+      // date_inscription et created_at seront automatiquement remplis par les valeurs par défaut
     });
 
     if (error) {
+      // Si l'utilisateur existe déjà, ce n'est pas une erreur critique
+      if (error.code === '23505' || error.message.includes('duplicate')) {
+        return; // L'utilisateur existe déjà, c'est OK
+      }
       throw new Error(`Erreur lors de la création de l'utilisateur: ${error.message}`);
     }
   }
@@ -214,5 +225,41 @@ export class SupabaseAuthService {
     if (error) {
       throw new Error(`Erreur lors de la mise à jour: ${error.message}`);
     }
+  }
+
+  /**
+   * Obtenir l'URL de redirection pour l'authentification Google
+   */
+  async getGoogleAuthUrl(redirectTo?: string): Promise<{ url: string; error: AuthError | null }> {
+    const redirectUrl = redirectTo || `${process.env.FRONTEND_URL || 'http://localhost:3001'}/auth/callback`;
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+
+    return {
+      url: data.url || '',
+      error: error,
+    };
+  }
+
+  /**
+   * Échanger le code d'autorisation contre une session (pour le callback)
+   */
+  async exchangeCodeForSession(code: string): Promise<AuthResponse> {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    return {
+      user: data.user,
+      session: data.session,
+      error: error,
+    };
   }
 }

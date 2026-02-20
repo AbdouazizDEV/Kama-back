@@ -25,6 +25,7 @@ export const env = {
   email: {
     sendgridApiKey: process.env.SENDGRID_API_KEY!,
     fromEmail: process.env.SENDGRID_FROM_EMAIL || 'noreply@kama.com',
+    supportEmail: process.env.SUPPORT_EMAIL || 'support@kama.com',
   },
   // Payment
   payment: {

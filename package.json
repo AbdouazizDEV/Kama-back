@@ -14,11 +14,15 @@
     "prisma:generate": "dotenv -e .env.local -- prisma generate",
     "prisma:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "prisma:studio": "dotenv -e .env.local -- prisma studio",
+    "prisma:seed": "dotenv -e .env.local -- ts-node prisma/seed.ts",
+    "db:seed": "npm run prisma:seed",
+    "db:approve-annonces": "dotenv -e .env.local -- ts-node scripts/approve-test-annonces.ts",
     "db:check": "ts-node scripts/check-db-connection.ts",
     "env:check": "ts-node scripts/check-env.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.9.0",
+    "@sendgrid/mail": "^8.1.6",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/supabase-js": "^2.39.0",
     "bcrypt": "^5.1.1",
