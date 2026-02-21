@@ -21,10 +21,15 @@ export class AdhererMutuelleUseCase {
       throw ApiError.forbidden('Accès réservé aux étudiants');
     }
 
-    // Vérifier si l'utilisateur a déjà une mutuelle active
+    // Vérifier si l'utilisateur a déjà une mutuelle
     const existingMutuelle = await this.mutuelleRepository.findByUserId(userId);
-    if (existingMutuelle && existingMutuelle.isActive()) {
-      throw ApiError.conflict('Vous avez déjà une adhésion active à la mutuelle');
+    if (existingMutuelle) {
+      if (existingMutuelle.isActive()) {
+        throw ApiError.conflict('Vous avez déjà une adhésion active à la mutuelle');
+      }
+      // Si la mutuelle existe mais n'est pas active, on ne peut pas créer une nouvelle
+      // car il y a une contrainte unique sur userId. Il faudrait réactiver l'ancienne.
+      throw ApiError.conflict('Vous avez déjà une adhésion à la mutuelle. Veuillez contacter le support pour réactiver votre adhésion.');
     }
 
     // Générer un numéro d'adhésion unique
