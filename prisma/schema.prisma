@@ -40,7 +40,6 @@ model User {
   avisProprietaire       Avis[]       @relation("ProprietaireAvis")
   etudiant               Etudiant?
   mutuelle               Mutuelle?
-  cotisations            Cotisation[]
   candidaturesColocation CandidatureColocation[] @relation("CandidatColocation")
 
   @@map("users")
