@@ -185,7 +185,7 @@ async function main() {
   const proprietaires = users.filter((u) => u.typeUtilisateur === 'PROPRIETAIRE');
   const annonces = [];
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 30; i++) {
     const villeData = villesGabon[Math.floor(Math.random() * villesGabon.length)];
     const quartier = villeData.quartiers[Math.floor(Math.random() * villeData.quartiers.length)];
     const typeBien = typesBiens[Math.floor(Math.random() * typesBiens.length)];
@@ -226,10 +226,11 @@ async function main() {
       .slice(0, nbEquipements);
 
     const estMeuble = selectedEquipements.includes('Meublé');
-    const estDisponible = Math.random() > 0.3; // 70% disponibles
-    const statutModeration = estDisponible
+    // S'assurer qu'au moins 20 annonces sont disponibles et approuvées pour les tests
+    const estDisponible = i < 20 || Math.random() > 0.3; // 70% disponibles
+    const statutModeration = i < 20 ? 'APPROUVE' : (estDisponible
       ? ['EN_ATTENTE', 'APPROUVE'][Math.floor(Math.random() * 2)]
-      : 'EN_ATTENTE';
+      : 'EN_ATTENTE');
 
     const dateDisponibilite = new Date();
     dateDisponibilite.setDate(dateDisponibilite.getDate() + Math.floor(Math.random() * 30));
@@ -268,8 +269,12 @@ async function main() {
   console.log('📅 Création des réservations...');
   const locataires = users.filter((u) => u.typeUtilisateur === 'LOCATAIRE' || u.typeUtilisateur === 'ETUDIANT');
   const annoncesDisponibles = annonces.filter((a) => a.estDisponible && a.statutModeration === 'APPROUVE');
+  const reservations = [];
 
-  for (let i = 0; i < 8; i++) {
+  // Créer des réservations avec différents statuts pour les tests
+  const statuts = ['EN_ATTENTE', 'ACCEPTEE', 'REJETEE', 'TERMINEE', 'ANNULEE'];
+  
+  for (let i = 0; i < 15; i++) {
     if (annoncesDisponibles.length === 0) break;
 
     const annonce = annoncesDisponibles[Math.floor(Math.random() * annoncesDisponibles.length)];
@@ -281,10 +286,13 @@ async function main() {
     dateFin.setDate(dateFin.getDate() + Math.floor(Math.random() * 30) + 7);
 
     const nombreJours = Math.ceil((dateFin.getTime() - dateDebut.getTime()) / (1000 * 60 * 60 * 24));
-    const prixTotal = Number(annonce.prix) * nombreJours;
-    const statut = ['EN_ATTENTE', 'ACCEPTEE', 'REJETEE', 'TERMINEE'][Math.floor(Math.random() * 4)];
+    // Limiter le prixTotal pour éviter le dépassement (max 99,999,999.99)
+    const prixJournalier = Number(annonce.prix);
+    const prixTotal = Math.min(prixJournalier * nombreJours, 99999999.99);
+    // S'assurer d'avoir au moins une réservation de chaque statut
+    const statut = i < statuts.length ? statuts[i] : statuts[Math.floor(Math.random() * statuts.length)];
 
-    await prisma.reservation.create({
+    const reservation = await prisma.reservation.create({
       data: {
         annonceId: annonce.id,
         locataireId: locataire.id,
@@ -298,14 +306,17 @@ async function main() {
         statut,
       },
     });
+
+    reservations.push(reservation);
   }
-  console.log('✅ Réservations créées\n');
+  console.log(`✅ ${reservations.length} réservations créées\n`);
 
   // Créer des favoris
   console.log('⭐ Création des favoris...');
-  for (let i = 0; i < 10; i++) {
+  let favorisCount = 0;
+  for (let i = 0; i < 15; i++) {
     const user = locataires[Math.floor(Math.random() * locataires.length)];
-    const annonce = annonces[Math.floor(Math.random() * annonces.length)];
+    const annonce = annoncesDisponibles[Math.floor(Math.random() * annoncesDisponibles.length)];
 
     try {
       await prisma.favori.create({
@@ -314,24 +325,148 @@ async function main() {
           annonceId: annonce.id,
         },
       });
+      favorisCount++;
     } catch (error) {
       // Ignorer les doublons
     }
   }
-  console.log('✅ Favoris créés\n');
+  console.log(`✅ ${favorisCount} favoris créés\n`);
+
+  // Créer des paiements
+  console.log('💳 Création des paiements...');
+  const paiements = [];
+  const reservationsAvecPaiement = reservations.filter((r) => 
+    r.statut === 'ACCEPTEE' || r.statut === 'TERMINEE'
+  );
+  const methodesPaiement = ['AIRTEL_MONEY', 'MOOV_MONEY', 'STRIPE', 'ESPECE'];
+  const statutsPaiement = ['EN_ATTENTE', 'VALIDE', 'ECHOUE', 'REMBOURSE'];
+
+  for (let i = 0; i < Math.min(10, reservationsAvecPaiement.length); i++) {
+    const reservation = reservationsAvecPaiement[i];
+    const methode = methodesPaiement[Math.floor(Math.random() * methodesPaiement.length)];
+    const statut = statutsPaiement[Math.floor(Math.random() * statutsPaiement.length)];
+    
+    // Créer différents types de paiements
+    const typesPaiement = ['CAUTION', 'LOYER', 'FRAIS'];
+    const typePaiement = typesPaiement[Math.floor(Math.random() * typesPaiement.length)];
+    
+    let montant = 0;
+    if (typePaiement === 'CAUTION') {
+      montant = Number(reservation.caution);
+    } else if (typePaiement === 'LOYER') {
+      montant = Number(reservation.prixTotal);
+    } else {
+      montant = Math.floor(Math.random() * 50000) + 10000; // Frais divers
+    }
+
+    const paiement = await prisma.paiement.create({
+      data: {
+        reservationId: reservation.id,
+        locataireId: reservation.locataireId,
+        proprietaireId: reservation.proprietaireId,
+        montant,
+        methodePaiement: methode,
+        statut,
+        referenceTransaction: statut === 'VALIDE' ? `TXN-${Date.now()}-${i}` : null,
+        dateValidation: statut === 'VALIDE' ? new Date() : null,
+      },
+    });
+
+    paiements.push(paiement);
+  }
+  console.log(`✅ ${paiements.length} paiements créés\n`);
+
+  // Créer des messages
+  console.log('💬 Création des messages...');
+  let messagesCount = 0;
+  for (let i = 0; i < Math.min(20, reservations.length); i++) {
+    const reservation = reservations[i];
+    
+    // Créer plusieurs messages par réservation (conversation)
+    const nbMessages = Math.floor(Math.random() * 5) + 2; // 2-6 messages
+    
+    for (let j = 0; j < nbMessages; j++) {
+      // Alterner entre locataire et propriétaire
+      const expediteurId = j % 2 === 0 ? reservation.locataireId : reservation.proprietaireId;
+      const destinataireId = j % 2 === 0 ? reservation.proprietaireId : reservation.locataireId;
+      
+      const contenus = [
+        'Bonjour, j\'aimerais avoir plus d\'informations sur cette annonce.',
+        'Merci pour votre réponse. Quand pourrais-je visiter le bien ?',
+        'Parfait, je suis disponible demain après-midi.',
+        'D\'accord, je confirme ma réservation.',
+        'Merci beaucoup, à bientôt !',
+      ];
+
+      try {
+        await prisma.message.create({
+          data: {
+            reservationId: reservation.id,
+            expediteurId,
+            destinataireId,
+            contenu: contenus[j % contenus.length] || contenus[0],
+            estLu: j < nbMessages - 1, // Les derniers messages ne sont pas lus
+            dateLecture: j < nbMessages - 1 ? new Date() : null,
+          },
+        });
+        messagesCount++;
+      } catch (error) {
+        console.error('Erreur création message:', error);
+      }
+    }
+  }
+  console.log(`✅ ${messagesCount} messages créés\n`);
+
+  // Créer des avis
+  console.log('⭐ Création des avis...');
+  let avisCount = 0;
+  const reservationsTerminees = reservations.filter((r) => r.statut === 'TERMINEE');
+  
+  for (let i = 0; i < Math.min(8, reservationsTerminees.length); i++) {
+    const reservation = reservationsTerminees[i];
+    
+    const commentaires = [
+      'Excellent logement, très propre et bien situé. Je recommande !',
+      'Très bon séjour, propriétaire très accueillant.',
+      'Logement conforme à la description, je suis satisfait.',
+      'Bien situé mais un peu bruyant. Dans l\'ensemble correct.',
+      'Parfait pour un séjour court, je reviendrai.',
+    ];
+
+    try {
+      await prisma.avis.create({
+        data: {
+          reservationId: reservation.id,
+          locataireId: reservation.locataireId,
+          proprietaireId: reservation.proprietaireId,
+          note: Math.floor(Math.random() * 2) + 4, // 4-5 étoiles
+          commentaire: commentaires[i % commentaires.length],
+        },
+      });
+      avisCount++;
+    } catch (error) {
+      // Ignorer les doublons (un avis par réservation)
+    }
+  }
+  console.log(`✅ ${avisCount} avis créés\n`);
 
   console.log('🎉 Seeding terminé avec succès!');
   console.log('\n📊 Résumé:');
   console.log(`   - ${users.length} utilisateurs`);
-  console.log(`   - ${annonces.length} annonces`);
-  console.log(`   - Réservations créées`);
-  console.log(`   - Favoris créés`);
+  console.log(`   - ${annonces.length} annonces (${annonces.filter(a => a.statutModeration === 'APPROUVE').length} approuvées)`);
+  console.log(`   - ${reservations.length} réservations`);
+  console.log(`   - ${favorisCount} favoris`);
+  console.log(`   - ${paiements.length} paiements`);
+  console.log(`   - ${messagesCount} messages`);
+  console.log(`   - ${avisCount} avis`);
   console.log('\n🔑 Comptes de test:');
   console.log('   Admin: admin@kama.ga / Password123!');
   console.log('   Propriétaire: jean.dupont@example.com / Password123!');
   console.log('   Locataire: sophie.durand@example.com / Password123!');
+  console.log('   Locataire (test): kahficontact1010@gmail.com / Password123!');
   console.log('   Étudiant: thomas.petit@example.com / Password123!');
   console.log('\n💡 Tous les utilisateurs ont le même mot de passe: Password123!');
+  console.log('\n✅ Données de test complètes pour tester tous les endpoints locataires !');
 }
 
 main()
