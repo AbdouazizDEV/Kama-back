@@ -78,7 +78,7 @@ export class SupabaseEtudiantRepository implements IEtudiantRepository {
   }
 
   private mapToEntity(data: any, userData: any): Etudiant {
-    const email = Email.create(userData.email);
+    const email = new Email(userData.email);
     const password = Password.fromHash(userData.password);
 
     return new Etudiant(

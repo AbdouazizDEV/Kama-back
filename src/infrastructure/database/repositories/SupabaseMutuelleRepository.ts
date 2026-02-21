@@ -140,7 +140,7 @@ export class SupabaseMutuelleRepository implements IMutuelleRepository {
     return new Cotisation(
       data.id,
       data.mutuelleId,
-      Prix.create(Number(data.montant)),
+      new Prix(Number(data.montant)),
       data.mois,
       data.annee,
       data.datePaiement ? new Date(data.datePaiement) : null,

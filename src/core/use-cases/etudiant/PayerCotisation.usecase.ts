@@ -44,7 +44,7 @@ export class PayerCotisationUseCase {
 
     if (!cotisation) {
       // Créer une nouvelle cotisation (montant fixe de 5000 FCFA par mois)
-      const montant = Prix.create(5000);
+      const montant = new Prix(5000);
       cotisation = new Cotisation(
         randomUUID(),
         mutuelle.id,
