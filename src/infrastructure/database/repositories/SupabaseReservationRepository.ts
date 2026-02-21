@@ -43,6 +43,19 @@ export class SupabaseReservationRepository implements IReservationRepository {
     return data ? data.map((item) => this.mapToEntity(item)) : [];
   }
 
+  async findAll(): Promise<Reservation[]> {
+    const { data, error } = await supabase
+      .from('reservations')
+      .select('*')
+      .order('dateCreation', { ascending: false });
+
+    if (error) {
+      throw new Error(`Erreur lors de la récupération: ${error.message}`);
+    }
+
+    return data ? data.map((item) => this.mapToEntity(item)) : [];
+  }
+
   async findByAnnonce(annonceId: string): Promise<Reservation[]> {
     const { data, error } = await supabase
       .from('reservations')
@@ -114,7 +127,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
   }
 
   private mapToEntity(data: any): Reservation {
-    return new Reservation(
+    return Reservation.fromDatabase(
       data.id,
       data.annonceId,
       data.locataireId,

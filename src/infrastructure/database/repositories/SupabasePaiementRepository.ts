@@ -56,6 +56,19 @@ export class SupabasePaiementRepository implements IPaiementRepository {
     return data ? data.map((item) => this.mapToEntity(item)) : [];
   }
 
+  async findAll(): Promise<Paiement[]> {
+    const { data, error } = await supabase
+      .from('paiements')
+      .select('*')
+      .order('dateCreation', { ascending: false });
+
+    if (error) {
+      throw new Error(`Erreur lors de la récupération: ${error.message}`);
+    }
+
+    return data ? data.map((item) => this.mapToEntity(item)) : [];
+  }
+
   async save(paiement: Paiement): Promise<void> {
     const { error } = await supabase
       .from('paiements')

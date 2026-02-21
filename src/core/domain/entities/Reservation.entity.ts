@@ -15,23 +15,60 @@ export class Reservation {
     public message: string | null,
     public readonly dateCreation: Date,
     public dateModification: Date,
-    public statut: StatutReservation
+    public statut: StatutReservation,
+    private skipDateValidation: boolean = false
   ) {
     // Validation des dates
     if (dateDebut >= dateFin) {
       throw new Error('La date de fin doit être postérieure à la date de début');
     }
-    // Permettre les dates futures (au moins aujourd'hui)
-    const aujourdhui = new Date();
-    aujourdhui.setHours(0, 0, 0, 0);
-    const dateDebutNormalisee = new Date(dateDebut);
-    dateDebutNormalisee.setHours(0, 0, 0, 0);
-    if (dateDebutNormalisee < aujourdhui) {
-      throw new Error('La date de début ne peut pas être dans le passé');
+    // Permettre les dates futures (au moins aujourd'hui) sauf si skipDateValidation est true
+    if (!skipDateValidation) {
+      const aujourdhui = new Date();
+      aujourdhui.setHours(0, 0, 0, 0);
+      const dateDebutNormalisee = new Date(dateDebut);
+      dateDebutNormalisee.setHours(0, 0, 0, 0);
+      if (dateDebutNormalisee < aujourdhui) {
+        throw new Error('La date de début ne peut pas être dans le passé');
+      }
     }
     if (nombrePersonnes < 1) {
       throw new Error('Le nombre de personnes doit être au moins 1');
     }
+  }
+
+  // Méthode statique pour créer une instance depuis la base de données (sans validation de dates passées)
+  static fromDatabase(
+    id: string,
+    annonceId: string,
+    locataireId: string,
+    proprietaireId: string,
+    dateDebut: Date,
+    dateFin: Date,
+    nombrePersonnes: number,
+    prixTotal: Prix,
+    caution: Prix,
+    message: string | null,
+    dateCreation: Date,
+    dateModification: Date,
+    statut: StatutReservation
+  ): Reservation {
+    return new Reservation(
+      id,
+      annonceId,
+      locataireId,
+      proprietaireId,
+      dateDebut,
+      dateFin,
+      nombrePersonnes,
+      prixTotal,
+      caution,
+      message,
+      dateCreation,
+      dateModification,
+      statut,
+      true // skipDateValidation = true pour les données existantes
+    );
   }
 
   accept(): void {
