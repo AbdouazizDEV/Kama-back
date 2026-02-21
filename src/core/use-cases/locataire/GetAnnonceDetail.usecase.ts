@@ -12,9 +12,14 @@ export class GetAnnonceDetailUseCase {
       throw ApiError.notFound('Annonce');
     }
 
-    // Vérifier que l'annonce est approuvée et disponible
-    if (annonce.statutModeration !== StatutModeration.APPROUVE || !annonce.estDisponible) {
-      throw ApiError.notFound('Annonce non disponible');
+    // Vérifier que l'annonce est approuvée
+    if (annonce.statutModeration !== StatutModeration.APPROUVE) {
+      throw ApiError.notFound('Annonce non approuvée ou introuvable');
+    }
+    
+    // Vérifier que l'annonce est disponible
+    if (!annonce.estDisponible) {
+      throw ApiError.notFound('Cette annonce n\'est plus disponible');
     }
 
     // Incrémenter le nombre de vues

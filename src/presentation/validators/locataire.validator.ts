@@ -27,8 +27,20 @@ export const searchAnnoncesLocataireSchema = z.object({
 // Validators pour les réservations
 export const createReservationSchema = z.object({
   annonceId: z.string().uuid(),
-  dateDebut: z.string().datetime(),
-  dateFin: z.string().datetime(),
+  dateDebut: z.string().refine(
+    (val) => {
+      const date = new Date(val);
+      return !isNaN(date.getTime());
+    },
+    { message: 'Date de début invalide' }
+  ),
+  dateFin: z.string().refine(
+    (val) => {
+      const date = new Date(val);
+      return !isNaN(date.getTime());
+    },
+    { message: 'Date de fin invalide' }
+  ),
   nombrePersonnes: z.number().int().min(1).max(20),
   message: z.string().max(1000).optional(),
 });

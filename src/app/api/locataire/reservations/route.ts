@@ -117,11 +117,23 @@ export async function POST(request: NextRequest) {
       }
 
       const validated = await validateRequest(req, createReservationSchema);
+      
+      // Normaliser les dates (s'assurer qu'elles sont au début de la journée)
+      const dateDebut = new Date(validated.dateDebut);
+      dateDebut.setHours(0, 0, 0, 0);
+      const dateFin = new Date(validated.dateFin);
+      dateFin.setHours(23, 59, 59, 999);
+      
+      // Vérifier que dateFin > dateDebut
+      if (dateFin <= dateDebut) {
+        throw ApiError.badRequest('La date de fin doit être postérieure à la date de début');
+      }
+      
       const reservation = await createReservationUseCase.execute({
         annonceId: validated.annonceId,
         locataireId: req.user.id,
-        dateDebut: new Date(validated.dateDebut),
-        dateFin: new Date(validated.dateFin),
+        dateDebut,
+        dateFin,
         nombrePersonnes: validated.nombrePersonnes,
         message: validated.message,
       });

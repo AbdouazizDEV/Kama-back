@@ -21,7 +21,12 @@ export class Reservation {
     if (dateDebut >= dateFin) {
       throw new Error('La date de fin doit être postérieure à la date de début');
     }
-    if (dateDebut < new Date()) {
+    // Permettre les dates futures (au moins aujourd'hui)
+    const aujourdhui = new Date();
+    aujourdhui.setHours(0, 0, 0, 0);
+    const dateDebutNormalisee = new Date(dateDebut);
+    dateDebutNormalisee.setHours(0, 0, 0, 0);
+    if (dateDebutNormalisee < aujourdhui) {
       throw new Error('La date de début ne peut pas être dans le passé');
     }
     if (nombrePersonnes < 1) {
