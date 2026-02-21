@@ -25,7 +25,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
     const { data, error } = await supabase
       .from('annonces')
       .select('*')
-      .eq('proprietaire_id', proprietaireId);
+      .eq('proprietaireId', proprietaireId);
 
     if (error) {
       throw new Error(`Erreur lors de la récupération: ${error.message}`);

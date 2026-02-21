@@ -24,7 +24,7 @@ export interface CreateAnnonceInput {
   nombrePieces?: number;
   estMeuble: boolean;
   equipements: string[];
-  photos: string[];
+  photos?: string[];
   dateDisponibilite: Date;
 }
 
@@ -72,7 +72,7 @@ export class CreateAnnonceUseCase {
       input.nombrePieces || null,
       input.estMeuble,
       input.equipements,
-      input.photos,
+      input.photos || [],
       false, // pas encore disponible avant publication
       input.dateDisponibilite,
       new Date(),
@@ -81,8 +81,8 @@ export class CreateAnnonceUseCase {
       StatutModeration.EN_ATTENTE
     );
 
-    // Valider et publier
-    annonce.publish();
+    // Ne pas publier automatiquement - l'annonce sera publiée après l'upload des photos
+    // annonce.publish();
 
     // Sauvegarder
     await this.annonceRepository.save(annonce);
