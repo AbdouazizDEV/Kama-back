@@ -101,6 +101,7 @@ export class SupabaseMutuelleRepository implements IMutuelleRepository {
       datePaiement: cotisation.datePaiement?.toISOString() || null,
       statut: cotisation.statut,
       referenceTransaction: cotisation.referenceTransaction,
+      dateModification: cotisation.dateModification.toISOString(),
     });
 
     if (error) {
