@@ -159,6 +159,7 @@ export class SupabaseColocationRepository implements IColocationRepository {
       candidatId: candidature.candidatId,
       message: candidature.message,
       statut: candidature.statut,
+      dateModification: candidature.dateModification.toISOString(),
     });
 
     if (error) {
