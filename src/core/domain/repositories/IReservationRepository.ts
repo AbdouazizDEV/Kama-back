@@ -5,6 +5,7 @@ export interface IReservationRepository {
   findByLocataire(locataireId: string): Promise<Reservation[]>;
   findByProprietaire(proprietaireId: string): Promise<Reservation[]>;
   findByAnnonce(annonceId: string): Promise<Reservation[]>;
+  findAll(): Promise<Reservation[]>;
   save(reservation: Reservation): Promise<void>;
   update(reservation: Reservation): Promise<void>;
   delete(id: string): Promise<void>;

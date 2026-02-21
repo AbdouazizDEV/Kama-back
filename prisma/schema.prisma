@@ -41,6 +41,9 @@ model User {
   etudiant               Etudiant?
   mutuelle               Mutuelle?
   candidaturesColocation CandidatureColocation[] @relation("CandidatColocation")
+  litigesLocataire       Litige[]                @relation("LocataireLitiges")
+  litigesProprietaire    Litige[]                @relation("ProprietaireLitiges")
+  commentairesLitige     CommentaireLitige[]     @relation("AuteurCommentairesLitige")
 
   @@map("users")
 }
@@ -102,6 +105,7 @@ model Reservation {
   paiements    Paiement[]
   messages     Message[]
   avis         Avis[]
+  litiges      Litige[]
 
   @@map("reservations")
 }
@@ -279,4 +283,39 @@ model CandidatureColocation {
 
   @@unique([colocationId, candidatId])
   @@map("candidatures_colocation")
+}
+
+model Litige {
+  id              String   @id @default(uuid())
+  reservationId   String?
+  locataireId     String
+  proprietaireId  String
+  type            String   // RESERVATION, PAIEMENT, ANNONCE, AUTRE
+  description     String   @db.Text
+  statut          String   @default("OUVERT") // OUVERT, EN_COURS, RESOLU, FERME
+  resolution      String?  @db.Text
+  dateCreation    DateTime  @default(now())
+  dateModification DateTime @updatedAt
+
+  // Relations
+  reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  locataire   User         @relation("LocataireLitiges", fields: [locataireId], references: [id], onDelete: Cascade)
+  proprietaire User        @relation("ProprietaireLitiges", fields: [proprietaireId], references: [id], onDelete: Cascade)
+  commentaires CommentaireLitige[]
+
+  @@map("litiges")
+}
+
+model CommentaireLitige {
+  id        String   @id @default(uuid())
+  litigeId  String
+  auteurId  String
+  contenu   String   @db.Text
+  date      DateTime  @default(now())
+
+  // Relations
+  litige Litige @relation(fields: [litigeId], references: [id], onDelete: Cascade)
+  auteur User   @relation("AuteurCommentairesLitige", fields: [auteurId], references: [id], onDelete: Cascade)
+
+  @@map("commentaires_litige")
 }

@@ -45,6 +45,24 @@ export class SupabaseMessageRepository implements IMessageRepository {
     return data.map((item) => this.mapToEntity(item));
   }
 
+  async findAll(): Promise<Message[]> {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .order('dateEnvoi', { ascending: false });
+
+    if (error || !data) return [];
+
+    return data.map((item) => this.mapToEntity(item));
+  }
+
+  async findFlagged(): Promise<Message[]> {
+    // TODO: Ajouter un champ `estSignale` dans le modèle Message si nécessaire
+    // Pour l'instant, retourner un tableau vide
+    // Une fois le champ ajouté, utiliser: .eq('estSignale', true)
+    return [];
+  }
+
   async findByUser(userId: string): Promise<Message[]> {
     const { data, error } = await supabase
       .from('messages')
