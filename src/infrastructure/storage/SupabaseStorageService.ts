@@ -125,15 +125,27 @@ export class SupabaseStorageService implements IStorageService {
   }
 
   /**
-   * Upload un document
+   * Upload un document (PDF, images, etc.)
    */
   async uploadDocument(file: Buffer, fileName: string, userId: string): Promise<string> {
     const fileExt = fileName.split('.').pop()?.toLowerCase() || '';
+    const isImage = this.isImageFile(fileExt);
+    const isVideo = this.isVideoFile(fileExt);
+
+    // Déterminer le bucket selon le type de fichier
+    let bucket: StorageBucket;
+    if (isImage) {
+      bucket = StorageBucket.ANNOUNCE_IMAGES; // Utiliser le bucket images pour les documents images
+    } else if (isVideo) {
+      bucket = StorageBucket.ANNOUNCE_VIDEOS;
+    } else {
+      bucket = StorageBucket.DOCUMENTS;
+    }
 
     const filePath = `documents/${userId}/${randomUUID()}.${fileExt}`;
 
     const { data, error } = await supabaseAdmin.storage
-      .from(StorageBucket.DOCUMENTS)
+      .from(bucket)
       .upload(filePath, file, {
         contentType: this.getContentType(fileExt),
         upsert: false,
@@ -144,7 +156,7 @@ export class SupabaseStorageService implements IStorageService {
       throw new Error(`Erreur lors de l'upload du document: ${error.message}`);
     }
 
-    return this.getFileUrl(data.path, StorageBucket.DOCUMENTS);
+    return this.getFileUrl(data.path, bucket);
   }
 
   /**
