@@ -38,6 +38,10 @@ model User {
   messagesDestinataire   Message[]    @relation("DestinataireMessages")
   avisLocataire          Avis[]       @relation("LocataireAvis")
   avisProprietaire       Avis[]       @relation("ProprietaireAvis")
+  etudiant               Etudiant?
+  mutuelle               Mutuelle?
+  cotisations            Cotisation[]
+  candidaturesColocation CandidatureColocation[] @relation("CandidatColocation")
 
   @@map("users")
 }
@@ -72,6 +76,7 @@ model Annonce {
   proprietaire  User          @relation("ProprietaireAnnonces", fields: [proprietaireId], references: [id])
   reservations  Reservation[]
   favoris       Favori[]
+  colocation     Colocation?
 
   @@map("annonces")
 }
@@ -183,4 +188,96 @@ model Avis {
 
   @@unique([reservationId, locataireId])
   @@map("avis")
+}
+
+model Etudiant {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  universite            String?
+  filiere               String?
+  niveauEtude           String?  // L1, L2, L3, M1, M2, Doctorat
+  numeroEtudiant        String?
+  statutVerification    String   @default("EN_ATTENTE") // EN_ATTENTE, VALIDE, REJETE
+  carteEtudianteUrl     String?
+  attestationInscriptionUrl String?
+  dateVerification      DateTime?
+  motifRejet            String?  @db.Text
+  dateCreation          DateTime  @default(now())
+  dateModification      DateTime  @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("etudiants")
+}
+
+model Mutuelle {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  numeroAdhesion  String   @unique
+  dateAdhesion    DateTime  @default(now())
+  dateResiliation DateTime?
+  estActive       Boolean   @default(true)
+  dateCreation    DateTime  @default(now())
+  dateModification DateTime @updatedAt
+
+  // Relations
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cotisations Cotisation[]
+
+  @@map("mutuelles")
+}
+
+model Cotisation {
+  id              String   @id @default(uuid())
+  mutuelleId      String
+  montant         Decimal  @db.Decimal(10, 2)
+  mois            Int      // 1-12
+  annee           Int
+  datePaiement    DateTime?
+  statut          String   @default("EN_ATTENTE") // EN_ATTENTE, PAYEE, EN_RETARD
+  referenceTransaction String?
+  dateCreation    DateTime  @default(now())
+  dateModification DateTime @updatedAt
+
+  // Relations
+  mutuelle Mutuelle @relation(fields: [mutuelleId], references: [id], onDelete: Cascade)
+
+  @@unique([mutuelleId, mois, annee])
+  @@map("cotisations")
+}
+
+model Colocation {
+  id              String   @id @default(uuid())
+  annonceId       String   @unique
+  nombrePlaces    Int
+  placesDisponibles Int
+  description     String?  @db.Text
+  regles          String[] @default([])
+  estActive       Boolean  @default(true)
+  dateCreation    DateTime  @default(now())
+  dateModification DateTime @updatedAt
+
+  // Relations
+  annonce         Annonce  @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+  candidatures    CandidatureColocation[]
+
+  @@map("colocations")
+}
+
+model CandidatureColocation {
+  id              String   @id @default(uuid())
+  colocationId     String
+  candidatId       String
+  message          String?  @db.Text
+  statut           String   @default("EN_ATTENTE") // EN_ATTENTE, ACCEPTEE, REJETEE
+  dateCreation     DateTime  @default(now())
+  dateModification DateTime  @updatedAt
+
+  // Relations
+  colocation Colocation @relation(fields: [colocationId], references: [id], onDelete: Cascade)
+  candidat  User       @relation("CandidatColocation", fields: [candidatId], references: [id], onDelete: Cascade)
+
+  @@unique([colocationId, candidatId])
+  @@map("candidatures_colocation")
 }
