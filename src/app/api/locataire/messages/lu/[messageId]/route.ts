@@ -11,7 +11,7 @@ const markMessageAsReadUseCase = new MarkMessageAsReadUseCase(messageRepository)
 
 /**
  * @swagger
- * /api/locataire/messages/{messageId}/lu:
+ * /api/locataire/messages/lu/{messageId}:
  *   put:
  *     summary: Marquer un message comme lu
  *     tags: [Locataire]
@@ -28,6 +28,18 @@ const markMessageAsReadUseCase = new MarkMessageAsReadUseCase(messageRepository)
  *     responses:
  *       200:
  *         description: Message marqué comme lu avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   nullable: true
  *       401:
  *         description: Non authentifié
  *       403:
