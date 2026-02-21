@@ -37,6 +37,7 @@ export class SupabaseMutuelleRepository implements IMutuelleRepository {
       dateAdhesion: mutuelle.dateAdhesion.toISOString(),
       dateResiliation: mutuelle.dateResiliation?.toISOString() || null,
       estActive: mutuelle.estActive,
+      dateModification: mutuelle.dateModification.toISOString(),
     });
 
     if (error) {

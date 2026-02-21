@@ -30,6 +30,7 @@ export class SupabaseEtudiantRepository implements IEtudiantRepository {
     // Générer un ID unique pour l'entité Etudiant
     const { randomUUID } = await import('crypto');
     const etudiantId = randomUUID();
+    const now = new Date();
     
     const { error } = await supabase.from('etudiants').insert({
       id: etudiantId,
@@ -43,6 +44,7 @@ export class SupabaseEtudiantRepository implements IEtudiantRepository {
       attestationInscriptionUrl: etudiant.attestationInscriptionUrl,
       dateVerification: etudiant.dateVerification?.toISOString() || null,
       motifRejet: etudiant.motifRejet,
+      dateModification: now.toISOString(),
     });
 
     if (error) {

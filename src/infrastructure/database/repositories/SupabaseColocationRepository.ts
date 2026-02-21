@@ -76,6 +76,7 @@ export class SupabaseColocationRepository implements IColocationRepository {
       description: colocation.description,
       regles: colocation.regles,
       estActive: colocation.estActive,
+      dateModification: colocation.dateModification.toISOString(),
     });
 
     if (error) {
