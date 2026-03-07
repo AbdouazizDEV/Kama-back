@@ -6,7 +6,6 @@ import { UserType } from '@/core/domain/entities/User.entity';
 import { StatutReservation } from '@/shared/constants/statuses.constant';
 import { StatutPaiement } from '@/shared/constants/statuses.constant';
 import { Paiement } from '@/core/domain/entities/Paiement.entity';
-import { Prix } from '@/core/domain/value-objects/Prix.vo';
 import { randomUUID } from 'crypto';
 
 export interface RestituerCautionInput {

@@ -33,12 +33,16 @@ export class SendGridEmailService implements IEmailService {
     try {
       await sgMail.send(msg);
       logger.info(`Email envoyé à ${to}. Sujet: ${subject}`);
-    } catch (error: any) {
-      logger.error(`Erreur lors de l'envoi de l'email à ${to}: ${error.message}`, error);
-      if (error.response) {
-        logger.error('Détails SendGrid:', error.response.body);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      logger.error(`Erreur lors de l'envoi de l'email à ${to}: ${errorMessage}`, error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const response = (error as { response?: { body?: unknown } }).response;
+        if (response?.body) {
+          logger.error('Détails SendGrid:', response.body);
+        }
       }
-      throw new Error(`Échec de l'envoi de l'email: ${error.message}`);
+      throw new Error(`Échec de l'envoi de l'email: ${errorMessage}`);
     }
   }
 

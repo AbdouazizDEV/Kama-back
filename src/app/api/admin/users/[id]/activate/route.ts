@@ -36,10 +36,10 @@ const activateUserUseCase = new ActivateUserUseCase(userRepository);
  *         description: Le compte est déjà actif
  */
 export async function PUT(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  return withAdmin(async (req: AuthenticatedRequest) => {
+  return withAdmin(async () => {
     try {
       await activateUserUseCase.execute(params.id);
 

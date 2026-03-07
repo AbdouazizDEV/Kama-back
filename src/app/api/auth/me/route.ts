@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { withAuth, AuthenticatedRequest } from '@/presentation/middlewares/auth.middleware';
 import { supabaseAdmin } from '@/config/supabase.config';
 import { SupabaseAuthService } from '@/infrastructure/auth/SupabaseAuthService';
@@ -61,9 +61,10 @@ async function handler(request: AuthenticatedRequest): Promise<NextResponse> {
 
         userData = newUserData;
         logger.info(`Utilisateur ${request.user.id} créé avec succès dans la table users`);
-      } catch (createError: any) {
+      } catch (createError: unknown) {
         // Si l'erreur est due à un utilisateur déjà existant (race condition), récupérer les données
-        if (createError.message?.includes('duplicate') || createError.message?.includes('already exists')) {
+        const errorMessage = createError instanceof Error ? createError.message : String(createError);
+        if (errorMessage.includes('duplicate') || errorMessage.includes('already exists')) {
           const { data: existingUser } = await supabaseAdmin
             .from('users')
             .select('*')

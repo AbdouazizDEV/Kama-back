@@ -142,6 +142,7 @@ export class SupabaseMessageRepository implements IMessageRepository {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Message {
     return new Message(
       data.id,
@@ -155,6 +156,7 @@ export class SupabaseMessageRepository implements IMessageRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToDatabase(message: Message): any {
     return {
       id: message.id,

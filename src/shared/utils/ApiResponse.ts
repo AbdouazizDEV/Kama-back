@@ -1,4 +1,4 @@
-export class ApiResponse<T = unknown> {
+export class ApiResponse {
   static success<T>(data: T, message = 'Success'): ApiSuccessResponse<T> {
     return {
       success: true,

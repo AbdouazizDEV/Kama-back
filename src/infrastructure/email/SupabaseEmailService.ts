@@ -22,7 +22,7 @@ export class SupabaseEmailService implements IEmailService {
     try {
       // Option 1: Utiliser Supabase Edge Function (recommandé)
       // Créez une Edge Function 'send-email' dans Supabase
-      const { data, error } = await supabaseAdmin.functions.invoke('send-email', {
+      const { error } = await supabaseAdmin.functions.invoke('send-email', {
         body: {
           to,
           subject,
@@ -45,8 +45,9 @@ export class SupabaseEmailService implements IEmailService {
       }
 
       logger.info(`Email envoyé à ${to} via Supabase. Sujet: ${subject}`);
-    } catch (error: any) {
-      logger.error(`Erreur lors de l'envoi de l'email à ${to}: ${error.message}`, error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      logger.error(`Erreur lors de l'envoi de l'email à ${to}: ${errorMessage}`, error);
       // Fallback: logger l'email
       console.log(`[SIMULATION] Email envoyé à ${to}:`, {
         subject,
@@ -70,10 +71,11 @@ export class SupabaseEmailService implements IEmailService {
   /**
    * Envoie un email de vérification via Supabase Auth
    */
-  async sendVerificationEmail(email: string, userId: string): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async sendVerificationEmail(email: string, _userId: string): Promise<void> {
     try {
       // Utiliser Supabase Auth pour renvoyer l'email de vérification
-      const { data, error } = await supabaseAdmin.auth.resend({
+      const { error } = await supabaseAdmin.auth.resend({
         type: 'signup',
         email: email,
         options: {
@@ -87,8 +89,9 @@ export class SupabaseEmailService implements IEmailService {
       }
 
       logger.info(`Email de vérification envoyé à ${email} via Supabase Auth`);
-    } catch (error: any) {
-      logger.error(`Erreur lors de l'envoi de l'email de vérification: ${error.message}`, error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      logger.error(`Erreur lors de l'envoi de l'email de vérification: ${errorMessage}`, error);
       throw error;
     }
   }
@@ -99,7 +102,7 @@ export class SupabaseEmailService implements IEmailService {
   async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
     try {
       // Utiliser Supabase Auth pour envoyer l'email de réinitialisation
-      const { data, error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
+      const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
         redirectTo: `${env.app.frontendUrl}/auth/reset-password?token=${resetToken}`,
       });
 
@@ -109,8 +112,9 @@ export class SupabaseEmailService implements IEmailService {
       }
 
       logger.info(`Email de réinitialisation envoyé à ${email} via Supabase Auth`);
-    } catch (error: any) {
-      logger.error(`Erreur lors de l'envoi de l'email de réinitialisation: ${error.message}`, error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      logger.error(`Erreur lors de l'envoi de l'email de réinitialisation: ${errorMessage}`, error);
       throw error;
     }
   }

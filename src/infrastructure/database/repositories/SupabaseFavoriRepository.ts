@@ -79,6 +79,7 @@ export class SupabaseFavoriRepository implements IFavoriRepository {
     return count || 0;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Favori {
     return new Favori(
       data.id,
@@ -88,6 +89,7 @@ export class SupabaseFavoriRepository implements IFavoriRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToDatabase(favori: Favori): any {
     return {
       id: favori.id,

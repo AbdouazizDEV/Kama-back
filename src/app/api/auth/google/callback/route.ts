@@ -38,7 +38,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Extraire les métadonnées de l'utilisateur Google
     const metadata = user.user_metadata || {};
-    const appMetadata = user.app_metadata || {};
     
     // Déterminer le nom et prénom depuis Google
     const fullName = metadata.full_name || metadata.name || '';
@@ -67,9 +66,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           typeUtilisateur
         );
         logger.info(`Utilisateur Google créé: ${user.id}`);
-      } catch (createError: any) {
+      } catch (createError: unknown) {
         // Si l'utilisateur existe déjà (race condition), continuer
-        if (!createError.message?.includes('duplicate') && !createError.message?.includes('already exists')) {
+        const errorMessage = createError instanceof Error ? createError.message : String(createError);
+        if (!errorMessage.includes('duplicate') && !errorMessage.includes('already exists')) {
           logger.error('Erreur lors de la création de l\'utilisateur Google:', createError);
         }
       }

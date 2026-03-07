@@ -104,6 +104,7 @@ export class SupabaseUserRepository implements IUserRepository {
     return count || 0;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): User {
     return new User(
       data.id,
@@ -120,6 +121,7 @@ export class SupabaseUserRepository implements IUserRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToDatabase(user: User): any {
     return {
       id: user.id,

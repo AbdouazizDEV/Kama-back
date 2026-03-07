@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { withAuth, AuthenticatedRequest } from '@/presentation/middlewares/auth.middleware';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';

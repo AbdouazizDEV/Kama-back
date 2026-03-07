@@ -126,6 +126,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
     return data ? data.map((item) => this.mapToEntity(item)) : [];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Reservation {
     return Reservation.fromDatabase(
       data.id,
@@ -144,6 +145,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToDatabase(reservation: Reservation): any {
     return {
       id: reservation.id,

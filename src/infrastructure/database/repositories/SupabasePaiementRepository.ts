@@ -98,6 +98,7 @@ export class SupabasePaiementRepository implements IPaiementRepository {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Paiement {
     return new Paiement(
       data.id,
@@ -115,6 +116,7 @@ export class SupabasePaiementRepository implements IPaiementRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToDatabase(paiement: Paiement): any {
     return {
       id: paiement.id,

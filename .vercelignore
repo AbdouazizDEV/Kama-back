@@ -1,0 +1,20 @@
+# Fichiers à ignorer lors du déploiement Vercel
+node_modules
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vscode
+.idea
+coverage
+.nyc_output
+dist
+build
+.next/cache
+prisma/migrations
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+scripts

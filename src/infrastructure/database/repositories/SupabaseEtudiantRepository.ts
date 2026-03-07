@@ -79,7 +79,13 @@ export class SupabaseEtudiantRepository implements IEtudiantRepository {
     }
   }
 
-  private mapToEntity(data: any, userData: any): Etudiant {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private mapToEntity(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    userData: any
+  ): Etudiant {
     const email = new Email(userData.email);
     const password = Password.fromHash(userData.password);
 

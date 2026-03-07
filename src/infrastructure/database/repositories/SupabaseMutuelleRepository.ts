@@ -125,6 +125,7 @@ export class SupabaseMutuelleRepository implements IMutuelleRepository {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Mutuelle {
     return new Mutuelle(
       data.id,
@@ -138,6 +139,7 @@ export class SupabaseMutuelleRepository implements IMutuelleRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapCotisationToEntity(data: any): Cotisation {
     return new Cotisation(
       data.id,

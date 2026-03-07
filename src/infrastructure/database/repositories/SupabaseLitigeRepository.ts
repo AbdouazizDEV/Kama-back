@@ -1,6 +1,5 @@
 import { ILitigeRepository, LitigeFilters } from '@/core/domain/repositories/ILitigeRepository';
 import { Litige, StatutLitige, TypeLitige } from '@/core/domain/entities/Litige.entity';
-import { supabase } from '../supabase.client';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -22,6 +21,7 @@ export class SupabaseLitigeRepository implements ILitigeRepository {
   }
 
   async findAll(filters?: LitigeFilters): Promise<Litige[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {};
 
     if (filters?.statut) {
@@ -102,6 +102,7 @@ export class SupabaseLitigeRepository implements ILitigeRepository {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Litige {
     const litige = new Litige(
       data.id,
@@ -119,6 +120,7 @@ export class SupabaseLitigeRepository implements ILitigeRepository {
 
     // Ajouter les commentaires
     if (data.commentaires && Array.isArray(data.commentaires)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data.commentaires.forEach((comment: any) => {
         litige.addComment(comment.auteurId, comment.contenu);
       });

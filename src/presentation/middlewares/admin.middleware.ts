@@ -1,6 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { withAuth, AuthenticatedRequest } from './auth.middleware';
-import { ApiError } from '@/shared/utils/ApiError';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { UserType } from '@/core/domain/entities/User.entity';
 
@@ -9,7 +8,7 @@ import { UserType } from '@/core/domain/entities/User.entity';
  */
 export function withAdmin(
   handler: (req: AuthenticatedRequest) => Promise<NextResponse>
-) {
+): (req: AuthenticatedRequest) => Promise<NextResponse> {
   return withAuth(async (req: AuthenticatedRequest) => {
     if (!req.user) {
       return NextResponse.json(

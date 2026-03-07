@@ -14,9 +14,17 @@ const options = {
       },
     },
     servers: [
+      ...(process.env.VERCEL_URL
+        ? [
+            {
+              url: `https://${process.env.VERCEL_URL}`,
+              description: 'Serveur Vercel (Production)',
+            },
+          ]
+        : []),
       {
-        url: env.app.apiUrl,
-        description: 'Serveur de développement',
+        url: env.app.apiUrl || 'http://localhost:3000',
+        description: process.env.NODE_ENV === 'production' ? 'Serveur de production' : 'Serveur de développement',
       },
     ],
     components: {

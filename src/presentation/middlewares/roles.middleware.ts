@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { AuthenticatedRequest } from './auth.middleware';
 import { UserRole, hasPermission } from '@/shared/constants/roles.constant';
-import { ApiError } from '@/shared/utils/ApiError';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 
 export function withRole(

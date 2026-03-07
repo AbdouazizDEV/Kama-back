@@ -137,6 +137,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Annonce {
     const adresse = new Adresse(
       data.ville,
@@ -170,6 +171,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToDatabase(annonce: Annonce): any {
     return {
       id: annonce.id,

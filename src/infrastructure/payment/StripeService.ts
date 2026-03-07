@@ -7,7 +7,8 @@ export class StripeService implements IPaymentService {
   async initiatePayment(
     amount: Prix,
     method: MethodePaiement,
-    metadata: PaymentMetadata
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _metadata: PaymentMetadata
   ): Promise<PaymentResult> {
     if (method !== MethodePaiement.STRIPE) {
       throw new Error('Méthode de paiement non supportée');
@@ -25,12 +26,14 @@ export class StripeService implements IPaymentService {
     };
   }
 
-  async validatePayment(transactionId: string): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async validatePayment(_transactionId: string): Promise<boolean> {
     // TODO: Vérifier le statut du paiement via l'API Stripe
     return true;
   }
 
-  async refundPayment(transactionId: string, amount: Prix): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async refundPayment(_transactionId: string, _amount: Prix): Promise<boolean> {
     // TODO: Implémenter le remboursement via l'API Stripe
     return true;
   }

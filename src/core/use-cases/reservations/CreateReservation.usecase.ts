@@ -2,7 +2,6 @@ import { IReservationRepository } from '../../domain/repositories/IReservationRe
 import { IAnnonceRepository } from '../../domain/repositories/IAnnonceRepository';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { Reservation } from '../../domain/entities/Reservation.entity';
-import { Prix } from '../../domain/value-objects/Prix.vo';
 import { ApiError } from '@/shared/utils/ApiError';
 import { StatutReservation } from '@/shared/constants/statuses.constant';
 import { randomUUID } from 'crypto';

@@ -22,7 +22,7 @@ export class SearchPublicAnnoncesUseCase {
   async execute(input: SearchPublicAnnoncesInput): Promise<SearchPublicAnnoncesOutput> {
     const { page, limit } = validatePaginationParams(input.page, input.limit);
 
-    const { data, total } = await this.annonceRepository.search({
+    const { data } = await this.annonceRepository.search({
       ...input,
       page,
       limit,

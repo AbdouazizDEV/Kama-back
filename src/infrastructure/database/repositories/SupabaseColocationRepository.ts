@@ -64,6 +64,7 @@ export class SupabaseColocationRepository implements IColocationRepository {
 
     if (error || !data) return [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return data.map((item: any) => this.mapToEntity(item));
   }
 
@@ -183,6 +184,7 @@ export class SupabaseColocationRepository implements IColocationRepository {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Colocation {
     return new Colocation(
       data.id,
@@ -197,6 +199,7 @@ export class SupabaseColocationRepository implements IColocationRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapCandidatureToEntity(data: any): CandidatureColocation {
     return new CandidatureColocation(
       data.id,

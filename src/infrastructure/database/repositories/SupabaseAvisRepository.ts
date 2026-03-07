@@ -78,6 +78,7 @@ export class SupabaseAvisRepository implements IAvisRepository {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): Avis {
     return new Avis(
       data.id,
@@ -91,6 +92,7 @@ export class SupabaseAvisRepository implements IAvisRepository {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToDatabase(avis: Avis): any {
     return {
       id: avis.id,

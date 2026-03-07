@@ -6,7 +6,6 @@ import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';
 import { validateQuery } from '@/presentation/middlewares/validation.middleware';
 import { exportPaiementsAdminSchema } from '@/presentation/validators/admin.validator';
-import { ApiError } from '@/shared/utils/ApiError';
 
 const paiementRepository = new SupabasePaiementRepository();
 const exportPaiementsAdminUseCase = new ExportPaiementsAdminUseCase(paiementRepository);

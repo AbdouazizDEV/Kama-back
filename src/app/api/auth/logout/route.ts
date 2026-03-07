@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { SupabaseAuthService } from '@/infrastructure/auth/SupabaseAuthService';
 import { withAuth, AuthenticatedRequest } from '@/presentation/middlewares/auth.middleware';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
