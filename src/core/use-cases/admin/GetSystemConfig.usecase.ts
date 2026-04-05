@@ -2,7 +2,7 @@
 // TODO: Implémenter un système de configuration persistant (base de données ou fichier)
 
 export interface SystemConfig {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export class GetSystemConfigUseCase {

@@ -6,6 +6,16 @@ import { handleError } from '@/presentation/middlewares/error.middleware';
 import { ApiError } from '@/shared/utils/ApiError';
 import { logger } from '@/shared/utils/logger';
 
+export const dynamic = 'force-dynamic';
+
+/** Row shape from public.users (subset used in this route) */
+type UsersTableRow = {
+  nom: string;
+  prenom: string;
+  telephone: string | null;
+  type_utilisateur: string;
+};
+
 /**
  * GET /api/auth/google/callback
  * Callback après authentification Google
@@ -86,16 +96,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     logger.info(`Authentification Google réussie pour: ${user.email}`);
 
+    const profile = existingUser as UsersTableRow | null;
+
     return NextResponse.json(
       ApiResponse.success(
         {
           user: {
             id: user.id,
             email: user.email,
-            nom: existingUser?.nom || nom,
-            prenom: existingUser?.prenom || prenom,
-            telephone: existingUser?.telephone || telephone,
-            typeUtilisateur: existingUser?.type_utilisateur || typeUtilisateur,
+            nom: profile?.nom || nom,
+            prenom: profile?.prenom || prenom,
+            telephone: profile?.telephone || telephone,
+            typeUtilisateur: profile?.type_utilisateur || typeUtilisateur,
             estVerifie: true,
           },
           session: {

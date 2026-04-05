@@ -1,4 +1,5 @@
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
+import { Paiement } from '@/core/domain/entities/Paiement.entity';
 
 export interface ExportPaiementsAdminInput {
   format: 'CSV' | 'PDF';
@@ -14,10 +15,12 @@ export class ExportPaiementsAdminUseCase {
 
     // Filtrer par dates si fournies
     if (input.dateDebut) {
-      paiements = paiements.filter((p) => p.dateCreation >= input.dateDebut!);
+      const dateDebut = input.dateDebut;
+      paiements = paiements.filter((p) => p.dateCreation >= dateDebut);
     }
     if (input.dateFin) {
-      paiements = paiements.filter((p) => p.dateCreation <= input.dateFin!);
+      const dateFin = input.dateFin;
+      paiements = paiements.filter((p) => p.dateCreation <= dateFin);
     }
 
     if (input.format === 'CSV') {
@@ -28,7 +31,7 @@ export class ExportPaiementsAdminUseCase {
     }
   }
 
-  private generateCSV(paiements: any[]): string {
+  private generateCSV(paiements: Paiement[]): string {
     const headers = [
       'ID',
       'Réservation ID',

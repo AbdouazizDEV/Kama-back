@@ -5,7 +5,7 @@ import { ApiError } from '@/shared/utils/ApiError';
 import { UserType } from '@/core/domain/entities/User.entity';
 import { StatutReservation } from '@/shared/constants/statuses.constant';
 import { StatutPaiement } from '@/shared/constants/statuses.constant';
-import { Paiement } from '@/core/domain/entities/Paiement.entity';
+import { Paiement, MethodePaiement } from '@/core/domain/entities/Paiement.entity';
 import { randomUUID } from 'crypto';
 
 export interface RestituerCautionInput {
@@ -60,7 +60,7 @@ export class RestituerCautionProprietaireUseCase {
       reservation.locataireId,
       input.proprietaireId,
       reservation.caution,
-      'AIRTEL_MONEY', // Par défaut, peut être modifié
+      MethodePaiement.AIRTEL_MONEY, // Par défaut, peut être modifié
       new Date(),
       new Date(),
       StatutPaiement.EN_ATTENTE,

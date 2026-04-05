@@ -9,6 +9,13 @@ import { ApiError } from '@/shared/utils/ApiError';
 import { logger } from '@/shared/utils/logger';
 import { supabaseAdmin } from '@/config/supabase.config';
 
+type UsersTableRow = {
+  est_actif: boolean;
+  nom: string;
+  prenom: string;
+  type_utilisateur: string;
+};
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Rate limiting
@@ -49,7 +56,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       logger.warn(`Utilisateur ${user.id} existe dans Auth mais pas dans la table users`);
     }
 
-    if (userData && !userData.est_actif) {
+    const row = userData as UsersTableRow | null;
+
+    if (row && !row.est_actif) {
       throw ApiError.forbidden('Votre compte a été désactivé');
     }
 
@@ -65,9 +74,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           user: {
             id: user.id,
             email: user.email,
-            nom: userData?.nom || user.user_metadata?.nom,
-            prenom: userData?.prenom || user.user_metadata?.prenom,
-            typeUtilisateur: userData?.type_utilisateur || user.user_metadata?.type_utilisateur,
+            nom: row?.nom || user.user_metadata?.nom,
+            prenom: row?.prenom || user.user_metadata?.prenom,
+            typeUtilisateur: row?.type_utilisateur || user.user_metadata?.type_utilisateur,
           },
           session: {
             accessToken: session.access_token,

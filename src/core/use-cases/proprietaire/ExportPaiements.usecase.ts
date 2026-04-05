@@ -1,5 +1,6 @@
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
+import { Paiement } from '@/core/domain/entities/Paiement.entity';
 import { ApiError } from '@/shared/utils/ApiError';
 import { UserType } from '@/core/domain/entities/User.entity';
 
@@ -29,21 +30,23 @@ export class ExportPaiementsProprietaireUseCase {
 
     // Filtrer par dates si fournies
     if (input.dateDebut) {
-      paiements = paiements.filter((p) => p.dateCreation >= input.dateDebut!);
+      const dateDebut = input.dateDebut;
+      paiements = paiements.filter((p) => p.dateCreation >= dateDebut);
     }
     if (input.dateFin) {
-      paiements = paiements.filter((p) => p.dateCreation <= input.dateFin!);
+      const dateFin = input.dateFin;
+      paiements = paiements.filter((p) => p.dateCreation <= dateFin);
     }
 
     if (input.format === 'CSV') {
       return this.generateCSV(paiements);
     } else {
       // TODO: Implémenter la génération PDF
-      throw ApiError.notImplemented('Export PDF non encore implémenté');
+      throw ApiError.badRequest('Export PDF non encore implémenté');
     }
   }
 
-  private generateCSV(paiements: any[]): string {
+  private generateCSV(paiements: Paiement[]): string {
     const headers = [
       'ID',
       'Réservation ID',

@@ -1,7 +1,11 @@
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
-import { IAnnonceRepository, SearchCriteria } from '@/core/domain/repositories/IAnnonceRepository';
+import { IAnnonceRepository } from '@/core/domain/repositories/IAnnonceRepository';
 import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
+import type { User } from '@/core/domain/entities/User.entity';
+import type { Annonce } from '@/core/domain/entities/Annonce.entity';
+import type { Reservation } from '@/core/domain/entities/Reservation.entity';
+import type { Paiement } from '@/core/domain/entities/Paiement.entity';
 
 export interface ActiviteReport {
   periode: {
@@ -120,7 +124,7 @@ export class GetActiviteReportUseCase {
       },
       paiements: {
         total: paiementsTotal,
-        valides: paiementsValides,
+        valides: paiementsValides.length,
         montantTotal,
       },
       activiteParJour,
@@ -131,10 +135,10 @@ export class GetActiviteReportUseCase {
     debut: Date,
     fin: Date,
     data: {
-      users: any[];
-      annonces: any[];
-      reservations: any[];
-      paiements: any[];
+      users: User[];
+      annonces: Annonce[];
+      reservations: Reservation[];
+      paiements: Paiement[];
     }
   ): Array<{ jour: string; utilisateurs: number; annonces: number; reservations: number; paiements: number }> {
     const grouped = new Map<string, { utilisateurs: number; annonces: number; reservations: number; paiements: number }>();

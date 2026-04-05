@@ -1,7 +1,6 @@
 import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
 import { Reservation } from '@/core/domain/entities/Reservation.entity';
 import { validatePaginationParams, calculatePagination } from '@/shared/utils/pagination';
-import { StatutReservation } from '@/shared/constants/statuses.constant';
 
 export interface ListReservationsAdminInput {
   page?: number;

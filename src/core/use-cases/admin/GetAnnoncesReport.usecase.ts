@@ -1,4 +1,5 @@
 import { IAnnonceRepository, SearchCriteria } from '@/core/domain/repositories/IAnnonceRepository';
+import { Annonce } from '@/core/domain/entities/Annonce.entity';
 import { StatutModeration } from '@/shared/constants/statuses.constant';
 
 export interface AnnoncesReport {
@@ -78,7 +79,7 @@ export class GetAnnoncesReportUseCase {
     };
   }
 
-  private groupByVille(annonces: any[]): Array<{ ville: string; count: number }> {
+  private groupByVille(annonces: Annonce[]): Array<{ ville: string; count: number }> {
     const grouped = new Map<string, number>();
 
     annonces.forEach((annonce) => {
@@ -91,7 +92,7 @@ export class GetAnnoncesReportUseCase {
       .sort((a, b) => b.count - a.count);
   }
 
-  private groupByMonth(annonces: any[]): Array<{ mois: string; count: number }> {
+  private groupByMonth(annonces: Annonce[]): Array<{ mois: string; count: number }> {
     const grouped = new Map<string, number>();
 
     annonces.forEach((annonce) => {

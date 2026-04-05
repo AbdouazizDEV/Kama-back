@@ -9,6 +9,7 @@ import { handleError } from '@/presentation/middlewares/error.middleware';
 import { validateRequest } from '@/presentation/middlewares/validation.middleware';
 import { createPaiementSchema } from '@/presentation/validators/locataire.validator';
 import { ApiError } from '@/shared/utils/ApiError';
+import { MethodePaiement } from '@/core/domain/entities/Paiement.entity';
 
 const paiementRepository = new SupabasePaiementRepository();
 const reservationRepository = new SupabaseReservationRepository();
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
       const paiement = await createPaiementUseCase.execute({
         reservationId: validated.reservationId,
         locataireId: req.user.id,
-        methodePaiement: validated.methodePaiement,
+        methodePaiement: validated.methodePaiement as MethodePaiement,
         montant: validated.montant,
         referenceTransaction: validated.referenceTransaction,
       });

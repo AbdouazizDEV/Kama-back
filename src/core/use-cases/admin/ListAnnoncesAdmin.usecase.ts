@@ -1,7 +1,6 @@
 import { IAnnonceRepository, SearchCriteria } from '@/core/domain/repositories/IAnnonceRepository';
 import { Annonce } from '@/core/domain/entities/Annonce.entity';
 import { validatePaginationParams, calculatePagination } from '@/shared/utils/pagination';
-import { StatutModeration } from '@/shared/constants/statuses.constant';
 
 export interface ListAnnoncesAdminInput {
   page?: number;
@@ -37,7 +36,7 @@ export class ListAnnoncesAdminUseCase {
       sortOrder: 'desc',
     };
 
-    const { data, total } = await this.annonceRepository.search(criteria);
+    const { data } = await this.annonceRepository.search(criteria);
 
     // Filtrer par statut de modération si spécifié
     let filteredData = data;

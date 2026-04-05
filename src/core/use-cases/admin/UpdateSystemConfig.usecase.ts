@@ -1,6 +1,6 @@
 export interface UpdateSystemConfigInput {
   key: string;
-  value: any;
+  value: unknown;
 }
 
 export class UpdateSystemConfigUseCase {

@@ -7,6 +7,20 @@ import { handleError } from '@/presentation/middlewares/error.middleware';
 import { ApiError } from '@/shared/utils/ApiError';
 import { logger } from '@/shared/utils/logger';
 
+/** public.users row (snake_case columns from Supabase) */
+type UsersTableRow = {
+  id: string;
+  email: string;
+  nom: string;
+  prenom: string;
+  telephone: string | null;
+  photo_profil: string | null;
+  type_utilisateur: string;
+  est_actif: boolean;
+  est_verifie: boolean;
+  date_inscription: string;
+};
+
 async function handler(request: AuthenticatedRequest): Promise<NextResponse> {
   try {
     if (!request.user) {
@@ -14,11 +28,13 @@ async function handler(request: AuthenticatedRequest): Promise<NextResponse> {
     }
 
     // Récupérer les données utilisateur depuis notre table
-    let { data: userData, error: dbError } = await supabaseAdmin
+    const { data: initialUserData, error: dbError } = await supabaseAdmin
       .from('users')
       .select('*')
       .eq('id', request.user.id)
       .single();
+
+    let userData = initialUserData;
 
     // Si l'utilisateur n'existe pas dans notre table, le créer depuis Supabase Auth
     if (dbError || !userData) {
@@ -86,18 +102,20 @@ async function handler(request: AuthenticatedRequest): Promise<NextResponse> {
       throw ApiError.notFound('Utilisateur');
     }
 
+    const u = userData as UsersTableRow;
+
     return NextResponse.json(
       ApiResponse.success({
-        id: userData.id,
-        email: userData.email,
-        nom: userData.nom,
-        prenom: userData.prenom,
-        telephone: userData.telephone,
-        photoProfil: userData.photo_profil,
-        typeUtilisateur: userData.type_utilisateur,
-        estActif: userData.est_actif,
-        estVerifie: userData.est_verifie,
-        dateInscription: userData.date_inscription,
+        id: u.id,
+        email: u.email,
+        nom: u.nom,
+        prenom: u.prenom,
+        telephone: u.telephone,
+        photoProfil: u.photo_profil,
+        typeUtilisateur: u.type_utilisateur,
+        estActif: u.est_actif,
+        estVerifie: u.est_verifie,
+        dateInscription: u.date_inscription,
       })
     );
   } catch (error) {

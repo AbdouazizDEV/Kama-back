@@ -1,4 +1,5 @@
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
+import { Paiement } from '@/core/domain/entities/Paiement.entity';
 import { StatutPaiement } from '@/shared/constants/statuses.constant';
 
 export interface RevenusReport {
@@ -68,7 +69,7 @@ export class GetRevenusReportUseCase {
     };
   }
 
-  private groupRevenusByMonth(paiements: any[]): Array<{ mois: string; montant: number; count: number }> {
+  private groupRevenusByMonth(paiements: Paiement[]): Array<{ mois: string; montant: number; count: number }> {
     const grouped = new Map<string, { montant: number; count: number }>();
 
     paiements.forEach((paiement) => {
@@ -86,7 +87,7 @@ export class GetRevenusReportUseCase {
       .sort((a, b) => a.mois.localeCompare(b.mois));
   }
 
-  private groupEvolutionByMonth(paiements: any[]): Array<{ mois: string; revenus: number; transactions: number }> {
+  private groupEvolutionByMonth(paiements: Paiement[]): Array<{ mois: string; revenus: number; transactions: number }> {
     return this.groupRevenusByMonth(paiements).map((item) => ({
       mois: item.mois,
       revenus: item.montant,

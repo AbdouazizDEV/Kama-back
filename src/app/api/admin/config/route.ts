@@ -43,7 +43,8 @@ const updateSystemConfigUseCase = new UpdateSystemConfigUseCase();
  *               key:
  *                 type: string
  *               value:
- *                 type: any
+ *                 description: Valeur de configuration (JSON, type selon la clé)
+ *                 type: object
  *     responses:
  *       200:
  *         description: Configuration modifiée avec succès

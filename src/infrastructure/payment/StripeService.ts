@@ -5,7 +5,7 @@ import { env } from '@/config/env.config';
 
 export class StripeService implements IPaymentService {
   async initiatePayment(
-    amount: Prix,
+    _amount: Prix,
     method: MethodePaiement,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _metadata: PaymentMetadata

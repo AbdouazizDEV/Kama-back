@@ -90,7 +90,7 @@ async function createTestData() {
   // Créer une annonce approuvée
   console.log('🏠 Création d\'une annonce approuvée...');
   const annonceId = randomUUID();
-  const { data: annonce, error: annonceError } = await supabase
+  const { error: annonceError } = await supabase
     .from('annonces')
     .insert({
       id: annonceId,
@@ -132,7 +132,7 @@ async function createTestData() {
   dateFin.setDate(dateFin.getDate() + 30);
 
   const reservationId = randomUUID();
-  const { data: reservation, error: reservationError } = await supabase
+  const { error: reservationError } = await supabase
     .from('reservations')
     .insert({
       id: reservationId,
@@ -162,7 +162,7 @@ async function createTestData() {
   // Créer un paiement en attente
   console.log('💳 Création d\'un paiement en attente...');
   const paiementId = randomUUID();
-  const { data: paiement, error: paiementError } = await supabase
+  const { error: paiementError } = await supabase
     .from('paiements')
     .insert({
       id: paiementId,
@@ -189,7 +189,7 @@ async function createTestData() {
   // Créer un message
   console.log('💬 Création d\'un message...');
   const messageId = randomUUID();
-  const { data: message, error: messageError } = await supabase
+  const { error: messageError } = await supabase
     .from('messages')
     .insert({
       id: messageId,

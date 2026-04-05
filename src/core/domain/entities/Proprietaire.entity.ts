@@ -15,9 +15,9 @@ export class Proprietaire extends User {
     estActif: boolean,
     estVerifie: boolean,
     public readonly numeroPieceIdentite: string | null = null,
-    public readonly estVerifieIdentite: boolean = false,
-    public readonly noteMoyenne: number = 0,
-    public readonly nombreAvis: number = 0
+    public estVerifieIdentite: boolean = false,
+    public noteMoyenne: number = 0,
+    public nombreAvis: number = 0
   ) {
     super(
       id,

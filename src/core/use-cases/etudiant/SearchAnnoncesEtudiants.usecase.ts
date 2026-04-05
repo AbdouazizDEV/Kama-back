@@ -8,7 +8,6 @@ export class SearchAnnoncesEtudiantsUseCase {
     // On peut utiliser un équipement spécial "Logement étudiant" ou un tag
     const result = await this.annonceRepository.search({
       ...criteria,
-      isPublic: true,
       equipements: criteria.equipements 
         ? [...criteria.equipements, 'Logement étudiant']
         : ['Logement étudiant'],

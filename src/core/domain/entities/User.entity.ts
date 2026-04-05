@@ -58,3 +58,33 @@ export abstract class User {
     return this.password.getHash();
   }
 }
+
+/** Compte administrateur (persisté comme `type_utilisateur = ADMIN`) */
+export class AdminUser extends User {
+  constructor(
+    id: string,
+    email: Email,
+    password: Password,
+    nom: string,
+    prenom: string,
+    telephone: string,
+    photoProfil: string | null,
+    dateInscription: Date,
+    estActif: boolean,
+    estVerifie: boolean
+  ) {
+    super(
+      id,
+      email,
+      password,
+      nom,
+      prenom,
+      telephone,
+      photoProfil,
+      dateInscription,
+      estActif,
+      estVerifie,
+      UserType.ADMIN
+    );
+  }
+}

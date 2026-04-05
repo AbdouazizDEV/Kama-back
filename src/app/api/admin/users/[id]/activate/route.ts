@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin, AuthenticatedRequest } from '@/presentation/middlewares/admin.middleware';
+import { withAdmin } from '@/presentation/middlewares/admin.middleware';
 import { ActivateUserUseCase } from '@/core/use-cases/admin/ActivateUser.usecase';
 import { SupabaseUserRepository } from '@/infrastructure/database/repositories/SupabaseUserRepository';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
@@ -50,5 +50,5 @@ export async function PUT(
     } catch (error) {
       return handleError(error);
     }
-  })(request);
+  })(_request);
 }

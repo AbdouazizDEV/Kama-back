@@ -7,7 +7,6 @@ export class SearchAnnoncesUseCase {
     // Filtrer uniquement les annonces approuvées et disponibles
     const result = await this.annonceRepository.search({
       ...criteria,
-      isPublic: true, // Utiliser le filtre public
     });
 
     return {

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { ZodSchema } from 'zod';
+import { ZodSchema, ZodType, ZodTypeDef } from 'zod';
 import { ApiError } from '@/shared/utils/ApiError';
 
 /**
@@ -24,10 +24,10 @@ export async function validateRequest<T>(
 /**
  * Valide les query parameters d'une requête (GET)
  */
-export function validateQuery<T>(
+export function validateQuery<TOutput, TInput = unknown>(
   query: Record<string, string | null>,
-  schema: ZodSchema<T>
-): T {
+  schema: ZodType<TOutput, ZodTypeDef, TInput>
+): TOutput {
   try {
     // Convertir les valeurs null en undefined pour Zod
     const cleanedQuery: Record<string, string | undefined> = {};

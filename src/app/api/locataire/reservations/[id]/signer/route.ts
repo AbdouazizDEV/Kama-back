@@ -51,7 +51,7 @@ export async function POST(
       }
 
       const { id } = params;
-      const reservation = await getReservationUseCase.execute(id, req.user.id);
+      await getReservationUseCase.execute(id, req.user.id);
 
       // TODO: Implémenter la signature électronique
       // Pour l'instant, simuler la signature

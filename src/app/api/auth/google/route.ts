@@ -5,6 +5,8 @@ import { handleError } from '@/presentation/middlewares/error.middleware';
 import { ApiError } from '@/shared/utils/ApiError';
 import { rateLimitMiddleware } from '@/presentation/middlewares/ratelimit.middleware';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/auth/google
  * Obtenir l'URL de redirection pour l'authentification Google

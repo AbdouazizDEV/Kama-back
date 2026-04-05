@@ -1,6 +1,7 @@
 import { GetProfilUseCase } from '../GetProfil.usecase';
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
-import { User } from '@/core/domain/entities/User.entity';
+import { Locataire } from '@/core/domain/entities/Locataire.entity';
+import { Proprietaire } from '@/core/domain/entities/Proprietaire.entity';
 import { Email } from '@/core/domain/value-objects/Email.vo';
 import { Password } from '@/core/domain/value-objects/Password.vo';
 import { UserType } from '@/core/domain/entities/User.entity';
@@ -26,7 +27,7 @@ describe('GetProfilUseCase', () => {
 
   it('should return user profile when user exists', async () => {
     const userId = 'user-123';
-    const mockUser = new User(
+    const mockUser = new Locataire(
       userId,
       new Email('test@example.com'),
       await Password.create('Password123!'),
@@ -36,15 +37,14 @@ describe('GetProfilUseCase', () => {
       null,
       new Date(),
       true,
-      true,
-      UserType.LOCATAIRE
+      true
     );
 
     mockUserRepository.findById.mockResolvedValue(mockUser);
 
     const result = await useCase.execute(userId);
 
-    expect(result).toBeInstanceOf(User);
+    expect(result).toBeInstanceOf(Locataire);
     expect(result.id).toBe(userId);
     expect(result.email.getValue()).toBe('test@example.com');
     expect(result.nom).toBe('Doe');
@@ -67,7 +67,7 @@ describe('GetProfilUseCase', () => {
 
   it('should throw ApiError when user is not a locataire', async () => {
     const userId = 'user-123';
-    const mockUser = new User(
+    const mockUser = new Proprietaire(
       userId,
       new Email('test@example.com'),
       await Password.create('Password123!'),
@@ -77,13 +77,12 @@ describe('GetProfilUseCase', () => {
       null,
       new Date(),
       true,
-      true,
-      UserType.PROPRIETAIRE
+      true
     );
 
     mockUserRepository.findById.mockResolvedValue(mockUser);
 
     await expect(useCase.execute(userId)).rejects.toThrow(ApiError);
-    await expect(useCase.execute(userId)).rejects.toThrow('Accès refusé');
+    await expect(useCase.execute(userId)).rejects.toThrow(/Accès refusé/);
   });
 });

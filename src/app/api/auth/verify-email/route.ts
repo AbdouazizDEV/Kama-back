@@ -6,7 +6,7 @@ import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';
 import { ApiError } from '@/shared/utils/ApiError';
 import { logger } from '@/shared/utils/logger';
-import { supabase, supabaseAdmin } from '@/config/supabase.config';
+import { supabaseAdmin } from '@/config/supabase.config';
 
 const verifyEmailSchema = z.object({
   token: z.string().optional(), // Token OTP (ancienne méthode)
@@ -67,20 +67,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         try {
           await authService.updateUserVerificationStatus(user.id, true);
           logger.info(`Statut de vérification mis à jour pour l'utilisateur: ${user.id}`);
-        } catch (dbError: any) {
-          logger.warn(`Erreur lors de la mise à jour du statut (non bloquant): ${dbError.message}`);
+        } catch (dbError: unknown) {
+          const msg = dbError instanceof Error ? dbError.message : String(dbError);
+          logger.warn(`Erreur lors de la mise à jour du statut (non bloquant): ${msg}`);
           // Ne pas bloquer si l'utilisateur n'existe pas encore dans notre table
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (error instanceof ApiError) {
           throw error;
         }
+        const err = error instanceof Error ? error : new Error(String(error));
         logger.error('Erreur lors de la vérification via access_token:', {
-          message: error?.message,
-          stack: error?.stack,
-          error: error,
+          message: err.message,
+          stack: err.stack,
+          error,
         });
-        throw ApiError.badRequest(`Erreur lors de la vérification: ${error?.message || 'Erreur inconnue'}`);
+        throw ApiError.badRequest(`Erreur lors de la vérification: ${err.message || 'Erreur inconnue'}`);
       }
     }
     // Cas 2: Vérification via token OTP (ancienne méthode)

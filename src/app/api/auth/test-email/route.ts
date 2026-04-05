@@ -20,7 +20,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const data = await validateRequest(request, testEmailSchema);
 
     // Tester l'envoi d'un email de vérification
-    const { data: resendData, error: resendError } = await supabase.auth.resend({
+    const { error: resendError } = await supabase.auth.resend({
       type: 'signup',
       email: data.email,
       options: {

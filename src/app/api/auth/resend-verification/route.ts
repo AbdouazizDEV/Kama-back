@@ -4,7 +4,6 @@ import { validateRequest } from '@/presentation/middlewares/validation.middlewar
 import { z } from 'zod';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';
-import { ApiError } from '@/shared/utils/ApiError';
 import { logger } from '@/shared/utils/logger';
 
 const resendVerificationSchema = z.object({

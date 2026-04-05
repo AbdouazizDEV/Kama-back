@@ -1,4 +1,4 @@
-import { Prix } from './value-objects/Prix.vo';
+import { Prix } from '../value-objects/Prix.vo';
 
 export enum StatutCotisation {
   EN_ATTENTE = 'EN_ATTENTE',

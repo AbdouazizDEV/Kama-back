@@ -29,9 +29,11 @@ export class GetQuartiersUseCase {
       throw new Error(`Erreur lors de la récupération des quartiers: ${error.message}`);
     }
 
+    const rows = (data ?? []) as Array<{ quartier: string; ville: string }>;
+
     // Compter les occurrences de chaque quartier
     const quartierCounts: Record<string, { ville: string; count: number }> = {};
-    data?.forEach((item) => {
+    rows.forEach((item) => {
       const key = `${item.ville}-${item.quartier}`;
       if (!quartierCounts[key]) {
         quartierCounts[key] = { ville: item.ville, count: 0 };

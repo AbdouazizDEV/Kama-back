@@ -11,7 +11,7 @@ import { logger } from '@/shared/utils/logger';
 export async function GET(): Promise<NextResponse> {
   try {
     // Test 1: Connexion basique
-    const { data: healthData, error: healthError } = await supabase
+    const { error: healthError } = await supabase
       .from('users')
       .select('count')
       .limit(0);
@@ -33,8 +33,9 @@ export async function GET(): Promise<NextResponse> {
     }
 
     // Test 2: Vérifier si la table users existe
-    const { data: tableData, error: tableError } = await supabase
-      .rpc('check_table_exists', { table_name: 'users' })
+    const { error: tableError } = await supabase
+      // RPC may be absent from generated Database types; runtime still accepts args
+      .rpc('check_table_exists', { table_name: 'users' } as never)
       .single();
 
     // Test 3: Compter les utilisateurs (si la table existe)

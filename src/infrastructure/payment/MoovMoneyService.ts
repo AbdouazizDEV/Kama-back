@@ -4,7 +4,7 @@ import { MethodePaiement } from '@/core/domain/entities/Paiement.entity';
 
 export class MoovMoneyService implements IPaymentService {
   async initiatePayment(
-    amount: Prix,
+    _amount: Prix,
     method: MethodePaiement,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _metadata: PaymentMetadata

@@ -1,4 +1,5 @@
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
+import { Paiement } from '@/core/domain/entities/Paiement.entity';
 import { StatutPaiement } from '@/shared/constants/statuses.constant';
 
 export interface PaiementsStatistics {
@@ -76,7 +77,7 @@ export class GetPaiementsStatisticsUseCase {
     };
   }
 
-  private groupByMonth(paiements: any[]): Array<{ mois: string; count: number; montant: number }> {
+  private groupByMonth(paiements: Paiement[]): Array<{ mois: string; count: number; montant: number }> {
     const grouped = new Map<string, { count: number; montant: number }>();
 
     paiements.forEach((paiement) => {

@@ -16,7 +16,7 @@ export class Reservation {
     public readonly dateCreation: Date,
     public dateModification: Date,
     public statut: StatutReservation,
-    private skipDateValidation: boolean = false
+    skipDateValidation: boolean = false
   ) {
     // Validation des dates
     if (dateDebut >= dateFin) {

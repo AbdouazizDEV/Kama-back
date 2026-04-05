@@ -37,7 +37,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
   async save(annonce: Annonce): Promise<void> {
     const { error } = await supabase
       .from('annonces')
-      .insert([this.mapToDatabase(annonce)]);
+      .insert([this.mapToDatabase(annonce)] as never);
 
     if (error) {
       throw new Error(`Erreur lors de la sauvegarde: ${error.message}`);
@@ -47,7 +47,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
   async update(annonce: Annonce): Promise<void> {
     const { error } = await supabase
       .from('annonces')
-      .update(this.mapToDatabase(annonce))
+      .update(this.mapToDatabase(annonce) as never)
       .eq('id', annonce.id);
 
     if (error) {
@@ -125,7 +125,7 @@ export class SupabaseAnnonceRepository implements IAnnonceRepository {
   }
 
   async incrementViews(id: string): Promise<void> {
-    const { error } = await supabase.rpc('increment_annonce_views', { annonce_id: id });
+    const { error } = await supabase.rpc('increment_annonce_views', { annonce_id: id } as never);
 
     if (error) {
       // Fallback: récupérer, incrémenter, sauvegarder

@@ -2,6 +2,9 @@ import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
 import { IAnnonceRepository } from '@/core/domain/repositories/IAnnonceRepository';
 import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
+import type { Annonce } from '@/core/domain/entities/Annonce.entity';
+import type { Reservation } from '@/core/domain/entities/Reservation.entity';
+import type { Paiement } from '@/core/domain/entities/Paiement.entity';
 import { ApiError } from '@/shared/utils/ApiError';
 import { UserType } from '@/core/domain/entities/User.entity';
 import { StatutReservation } from '@/shared/constants/statuses.constant';
@@ -64,7 +67,7 @@ export class GetDashboardProprietaireUseCase {
     };
   }
 
-  private calculerRevenusMois(paiements: any[]): number {
+  private calculerRevenusMois(paiements: Paiement[]): number {
     const maintenant = new Date();
     const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1);
     return paiements
@@ -77,7 +80,7 @@ export class GetDashboardProprietaireUseCase {
       .reduce((sum, p) => sum + p.montant.getMontant(), 0);
   }
 
-  private calculerTauxOccupation(annonces: any[], reservations: any[]): number {
+  private calculerTauxOccupation(annonces: Annonce[], reservations: Reservation[]): number {
     // Calcul simplifié - à améliorer avec vraie logique de dates
     const reservationsActives = reservations.filter(
       (r) => r.statut === StatutReservation.ACCEPTEE || r.statut === StatutReservation.TERMINEE

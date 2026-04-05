@@ -1,5 +1,8 @@
 import { IUserRepository, UserFilters } from '@/core/domain/repositories/IUserRepository';
-import { User } from '@/core/domain/entities/User.entity';
+import { User, UserType, AdminUser } from '@/core/domain/entities/User.entity';
+import { Locataire } from '@/core/domain/entities/Locataire.entity';
+import { Proprietaire } from '@/core/domain/entities/Proprietaire.entity';
+import { Etudiant } from '@/core/domain/entities/Etudiant.entity';
 import { supabase } from '../supabase.client';
 import { Email } from '@/core/domain/value-objects/Email.vo';
 import { Password } from '@/core/domain/value-objects/Password.vo';
@@ -106,19 +109,67 @@ export class SupabaseUserRepository implements IUserRepository {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private mapToEntity(data: any): User {
-    return new User(
-      data.id,
-      new Email(data.email),
-      Password.fromHash(data.password),
-      data.nom,
-      data.prenom,
-      data.telephone,
-      data.photo_profil,
-      new Date(data.date_inscription),
-      data.est_actif,
-      data.est_verifie,
-      data.type_utilisateur
-    );
+    const id = data.id;
+    const email = new Email(data.email);
+    const password = Password.fromHash(data.password);
+    const dateInscription = new Date(data.date_inscription);
+
+    switch (data.type_utilisateur as UserType) {
+      case UserType.LOCATAIRE:
+        return new Locataire(
+          id,
+          email,
+          password,
+          data.nom,
+          data.prenom,
+          data.telephone,
+          data.photo_profil,
+          dateInscription,
+          data.est_actif,
+          data.est_verifie
+        );
+      case UserType.PROPRIETAIRE:
+        return new Proprietaire(
+          id,
+          email,
+          password,
+          data.nom,
+          data.prenom,
+          data.telephone,
+          data.photo_profil,
+          dateInscription,
+          data.est_actif,
+          data.est_verifie
+        );
+      case UserType.ETUDIANT:
+        return new Etudiant(
+          id,
+          email,
+          password,
+          data.nom,
+          data.prenom,
+          data.telephone,
+          data.photo_profil,
+          dateInscription,
+          data.est_actif,
+          data.est_verifie
+        );
+      case UserType.ADMIN:
+        return new AdminUser(
+          id,
+          email,
+          password,
+          data.nom,
+          data.prenom,
+          data.telephone,
+          data.photo_profil,
+          dateInscription,
+          data.est_actif,
+          data.est_verifie
+        );
+      default:
+        throw new Error(`Type utilisateur inconnu: ${data.type_utilisateur}`);
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

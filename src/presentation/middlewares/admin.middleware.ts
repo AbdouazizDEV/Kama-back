@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withAuth, AuthenticatedRequest } from './auth.middleware';
+
+export type { AuthenticatedRequest };
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { UserType } from '@/core/domain/entities/User.entity';
 

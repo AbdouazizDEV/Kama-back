@@ -4,6 +4,8 @@ import { SupabaseAnnonceRepository } from '@/infrastructure/database/repositorie
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';
 
+export const dynamic = 'force-dynamic';
+
 const annonceRepository = new SupabaseAnnonceRepository();
 const getRecentAnnoncesUseCase = new GetRecentAnnoncesUseCase(annonceRepository);
 
@@ -31,7 +33,8 @@ const getRecentAnnoncesUseCase = new GetRecentAnnoncesUseCase(annonceRepository)
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+    const limitParam = searchParams.get('limit');
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
 
     const annonces = await getRecentAnnoncesUseCase.execute({ limit });
 

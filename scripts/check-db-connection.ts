@@ -24,7 +24,7 @@ async function checkConnection(): Promise<void> {
   // 2. Tester la connexion Supabase
   console.log('2️⃣ Test de connexion à Supabase...');
   try {
-    const { data, error } = await supabase.from('users').select('count').limit(0);
+    const { error } = await supabase.from('users').select('count').limit(0);
 
     if (error) {
       console.error('   ❌ Erreur de connexion:', error.message);

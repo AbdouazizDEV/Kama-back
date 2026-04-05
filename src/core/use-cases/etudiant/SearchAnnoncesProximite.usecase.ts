@@ -11,7 +11,8 @@ export class SearchAnnoncesProximiteUseCase {
   async execute(userId: string, criteria: SearchCriteria) {
     // Récupérer l'université de l'étudiant
     const etudiant = await this.etudiantRepository.findByUserId(userId);
-    if (!etudiant || !etudiant.universite) {
+    const universite = etudiant?.universite ?? null;
+    if (!etudiant || !universite) {
       throw ApiError.badRequest('Veuillez d\'abord renseigner votre université dans votre profil');
     }
 
@@ -19,10 +20,9 @@ export class SearchAnnoncesProximiteUseCase {
     // TODO: Implémenter la recherche par proximité géographique avec latitude/longitude
     const result = await this.annonceRepository.search({
       ...criteria,
-      isPublic: true,
-      ville: etudiant.universite.includes('Libreville') ? 'Libreville' : 
-            etudiant.universite.includes('Port-Gentil') ? 'Port-Gentil' :
-            etudiant.universite.includes('Franceville') ? 'Franceville' : undefined,
+      ville: universite.includes('Libreville') ? 'Libreville' : 
+            universite.includes('Port-Gentil') ? 'Port-Gentil' :
+            universite.includes('Franceville') ? 'Franceville' : undefined,
     });
 
     return {
@@ -35,7 +35,7 @@ export class SearchAnnoncesProximiteUseCase {
         caution: annonce.caution.getMontant(),
         ville: annonce.adresse.ville,
         quartier: annonce.adresse.quartier,
-        distance: this.calculateDistance(etudiant.universite, annonce.adresse.ville), // Approximation
+        distance: this.calculateDistance(universite, annonce.adresse.ville), // Approximation
         photos: annonce.photos,
         estDisponible: annonce.estDisponible,
         nombreVues: annonce.nombreVues,

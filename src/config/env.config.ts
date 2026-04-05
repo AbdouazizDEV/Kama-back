@@ -1,17 +1,25 @@
+function requiredEnv(name: string): string {
+  const value = process.env[name];
+  if (value === undefined || value === '') {
+    throw new Error(`Variable d'environnement manquante ou vide: ${name}`);
+  }
+  return value;
+}
+
 export const env = {
   // Supabase
   supabase: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    url: requiredEnv('NEXT_PUBLIC_SUPABASE_URL'),
+    anonKey: requiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+    serviceRoleKey: requiredEnv('SUPABASE_SERVICE_ROLE_KEY'),
   },
   // Database
   database: {
-    url: process.env.DATABASE_URL!,
+    url: requiredEnv('DATABASE_URL'),
   },
   // JWT
   jwt: {
-    secret: process.env.JWT_SECRET!,
+    secret: requiredEnv('JWT_SECRET'),
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
   },
@@ -23,7 +31,7 @@ export const env = {
   },
   // Email
   email: {
-    sendgridApiKey: process.env.SENDGRID_API_KEY!,
+    sendgridApiKey: process.env.SENDGRID_API_KEY ?? '',
     fromEmail: process.env.SENDGRID_FROM_EMAIL || 'noreply@kama.com',
     supportEmail: process.env.SUPPORT_EMAIL || 'support@kama.com',
   },

@@ -44,18 +44,15 @@ export class UploadDocumentsVerificationProprietaireUseCase {
 
     // Uploader les fichiers
     const pieceIdentiteBuffer = Buffer.from(await input.pieceIdentite.arrayBuffer());
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const pieceIdentiteUrl = await this.storageService.uploadDocument(
+    await this.storageService.uploadDocument(
       pieceIdentiteBuffer,
       `piece-identite-${Date.now()}.${this.getFileExtension(input.pieceIdentite.name)}`,
       input.userId
     );
 
-    let justificatifUrl: string | undefined;
     if (input.justificatifDomicile) {
       const justificatifBuffer = Buffer.from(await input.justificatifDomicile.arrayBuffer());
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      justificatifUrl = await this.storageService.uploadDocument(
+      await this.storageService.uploadDocument(
         justificatifBuffer,
         `justificatif-domicile-${Date.now()}.${this.getFileExtension(input.justificatifDomicile.name)}`,
         input.userId

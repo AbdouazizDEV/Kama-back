@@ -63,12 +63,13 @@ export class ListConversationsProprietaireUseCase {
 
     // Trier par date du dernier message (plus récent en premier)
     return conversations.sort((a, b) => {
-      if (!a.dernierMessage && !b.dernierMessage) return 0;
-      if (!a.dernierMessage) return 1;
-      if (!b.dernierMessage) return -1;
+      const aMsg = a.dernierMessage;
+      const bMsg = b.dernierMessage;
+      if (!aMsg && !bMsg) return 0;
+      if (!aMsg) return 1;
+      if (!bMsg) return -1;
       return (
-        new Date(b.dernierMessage!.dateEnvoi).getTime() -
-        new Date(a.dernierMessage!.dateEnvoi).getTime()
+        new Date(bMsg.dateEnvoi).getTime() - new Date(aMsg.dateEnvoi).getTime()
       );
     });
   }

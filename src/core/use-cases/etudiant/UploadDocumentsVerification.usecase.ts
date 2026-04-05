@@ -69,15 +69,13 @@ export class UploadDocumentsVerificationUseCase {
     if (!etudiant) {
       // Créer un nouvel étudiant avec les documents
       const { Etudiant, StatutVerificationEtudiant } = await import('@/core/domain/entities/Etudiant.entity');
-      const { Email } = await import('@/core/domain/value-objects/Email.vo');
       const { Password } = await import('@/core/domain/value-objects/Password.vo');
-      
-      const email = Email.create(user.email.getValue());
+
       const password = Password.fromHash(user.getPasswordHash());
-      
+
       etudiant = new Etudiant(
         user.id,
-        email,
+        user.email,
         password,
         user.nom,
         user.prenom,

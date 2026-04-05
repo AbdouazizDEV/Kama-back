@@ -7,12 +7,12 @@ export interface CustomReportInput {
   type: 'users' | 'annonces' | 'reservations' | 'paiements' | 'activite';
   dateDebut?: Date;
   dateFin?: Date;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   format?: 'JSON' | 'CSV' | 'PDF';
 }
 
 export interface CustomReportOutput {
-  data: any;
+  data: unknown;
   format: string;
   generatedAt: Date;
 }
@@ -26,7 +26,7 @@ export class GenerateCustomReportUseCase {
   ) {}
 
   async execute(input: CustomReportInput): Promise<CustomReportOutput> {
-    let data: any;
+    let data: unknown;
 
     switch (input.type) {
       case 'users':
@@ -55,29 +55,29 @@ export class GenerateCustomReportUseCase {
     };
   }
 
-  private async generateUsersReport(input: CustomReportInput): Promise<any> {
+  private async generateUsersReport(_input: CustomReportInput): Promise<unknown> {
     const allUsers = await this.userRepository.findAll();
     // Appliquer les filtres si fournis
     return { total: allUsers.length, users: allUsers };
   }
 
-  private async generateAnnoncesReport(input: CustomReportInput): Promise<any> {
+  private async generateAnnoncesReport(_input: CustomReportInput): Promise<unknown> {
     const criteria: SearchCriteria = { page: 1, limit: 10000 };
     const { data: allAnnonces } = await this.annonceRepository.search(criteria);
     return { total: allAnnonces.length, annonces: allAnnonces };
   }
 
-  private async generateReservationsReport(input: CustomReportInput): Promise<any> {
+  private async generateReservationsReport(_input: CustomReportInput): Promise<unknown> {
     const allReservations = await this.reservationRepository.findAll();
     return { total: allReservations.length, reservations: allReservations };
   }
 
-  private async generatePaiementsReport(input: CustomReportInput): Promise<any> {
+  private async generatePaiementsReport(_input: CustomReportInput): Promise<unknown> {
     const allPaiements = await this.paiementRepository.findAll();
     return { total: allPaiements.length, paiements: allPaiements };
   }
 
-  private async generateActiviteReport(input: CustomReportInput): Promise<any> {
+  private async generateActiviteReport(_input: CustomReportInput): Promise<unknown> {
     // Utiliser GetActiviteReportUseCase si nécessaire
     return { message: 'Rapport d\'activité généré' };
   }

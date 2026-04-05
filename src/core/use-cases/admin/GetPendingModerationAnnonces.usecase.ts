@@ -31,7 +31,7 @@ export class GetPendingModerationAnnoncesUseCase {
       sortOrder: 'desc',
     };
 
-    const { data, total } = await this.annonceRepository.search(criteria);
+    const { data } = await this.annonceRepository.search(criteria);
 
     // Filtrer uniquement les annonces en attente
     const pendingAnnonces = data.filter((a) => a.statutModeration === StatutModeration.EN_ATTENTE);

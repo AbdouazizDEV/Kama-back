@@ -9,6 +9,7 @@ import { handleError } from '@/presentation/middlewares/error.middleware';
 import { validateRequest } from '@/presentation/middlewares/validation.middleware';
 import { createAnnonceProprietaireSchema } from '@/presentation/validators/proprietaire.validator';
 import { ApiError } from '@/shared/utils/ApiError';
+import { TypeBien } from '@/core/domain/entities/Annonce.entity';
 
 const userRepository = new SupabaseUserRepository();
 const annonceRepository = new SupabaseAnnonceRepository();
@@ -140,6 +141,7 @@ export async function POST(request: NextRequest) {
       const validated = await validateRequest(req, createAnnonceProprietaireSchema);
       const annonce = await createAnnonceUseCase.execute({
         ...validated,
+        typeBien: validated.typeBien as TypeBien,
         proprietaireId: req.user.id,
         dateDisponibilite: new Date(validated.dateDisponibilite),
       });

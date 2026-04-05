@@ -6,6 +6,8 @@ import { handleError } from '@/presentation/middlewares/error.middleware';
 import { validateQuery } from '@/presentation/middlewares/validation.middleware';
 import { searchAnnoncesSchema } from '@/presentation/validators/public.validator';
 
+export const dynamic = 'force-dynamic';
+
 const annonceRepository = new SupabaseAnnonceRepository();
 const searchPublicAnnoncesUseCase = new SearchPublicAnnoncesUseCase(annonceRepository);
 

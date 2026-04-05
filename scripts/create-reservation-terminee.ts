@@ -101,8 +101,8 @@ async function createReservationTerminee() {
     .update({ statut: 'TERMINEE' })
     .eq('id', reservationId);
 
-  if (reservationError) {
-    console.error('❌ Erreur lors de la création de la réservation:', reservationError);
+  if (updateError) {
+    console.error('❌ Erreur lors de la mise à jour du statut:', updateError);
     process.exit(1);
   }
 

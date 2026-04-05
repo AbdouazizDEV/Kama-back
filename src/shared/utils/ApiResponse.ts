@@ -49,3 +49,9 @@ export interface PaginationMeta {
   total: number;
   totalPages: number;
 }
+
+export interface ApiPaginatedResponse<T> {
+  success: true;
+  data: T[];
+  pagination: PaginationMeta;
+}

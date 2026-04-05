@@ -18,9 +18,11 @@ export class GetVillesUseCase {
       throw new Error(`Erreur lors de la récupération des villes: ${error.message}`);
     }
 
+    const rows = (data ?? []) as Array<{ ville: string }>;
+
     // Compter les occurrences de chaque ville
     const villeCounts: Record<string, number> = {};
-    data?.forEach((item) => {
+    rows.forEach((item) => {
       const ville = item.ville;
       villeCounts[ville] = (villeCounts[ville] || 0) + 1;
     });

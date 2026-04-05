@@ -202,7 +202,7 @@ export class SupabaseAuthService {
       est_verifie: false,
       updated_at: now,
       // date_inscription et created_at seront automatiquement remplis par les valeurs par défaut
-    });
+    } as never);
 
     if (error) {
       // Si l'utilisateur existe déjà, ce n'est pas une erreur critique
@@ -219,7 +219,7 @@ export class SupabaseAuthService {
   async updateUserVerificationStatus(userId: string, verified: boolean): Promise<void> {
     const { error } = await supabaseAdmin
       .from('users')
-      .update({ est_verifie: verified })
+      .update({ est_verifie: verified } as never)
       .eq('id', userId);
 
     if (error) {

@@ -44,10 +44,12 @@ export class GetStatistiquesUseCase {
       .select('*', { count: 'exact', head: true });
 
     // Annonces par type
-    const { data: annoncesParType } = await supabase
+    const { data: annoncesParTypeRaw } = await supabase
       .from('annonces')
       .select('typeBien')
       .eq('statutModeration', 'APPROUVE');
+
+    const annoncesParType = (annoncesParTypeRaw ?? []) as Array<{ typeBien: string }>;
 
     const typeCounts = {
       APPARTEMENT: 0,
@@ -56,7 +58,7 @@ export class GetStatistiquesUseCase {
       VEHICULE: 0,
     };
 
-    annoncesParType?.forEach((item) => {
+    annoncesParType.forEach((item) => {
       const type = item.typeBien as keyof typeof typeCounts;
       if (typeCounts[type] !== undefined) {
         typeCounts[type]++;
@@ -64,13 +66,15 @@ export class GetStatistiquesUseCase {
     });
 
     // Annonces par ville (top 5)
-    const { data: annoncesParVille } = await supabase
+    const { data: annoncesParVilleRaw } = await supabase
       .from('annonces')
       .select('ville')
       .eq('statutModeration', 'APPROUVE');
 
+    const annoncesParVille = (annoncesParVilleRaw ?? []) as Array<{ ville: string }>;
+
     const villeCounts: Record<string, number> = {};
-    annoncesParVille?.forEach((item) => {
+    annoncesParVille.forEach((item) => {
       villeCounts[item.ville] = (villeCounts[item.ville] || 0) + 1;
     });
 

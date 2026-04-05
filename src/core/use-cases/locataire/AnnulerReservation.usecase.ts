@@ -5,7 +5,7 @@ import { StatutReservation } from '@/shared/constants/statuses.constant';
 export class AnnulerReservationUseCase {
   constructor(private reservationRepository: IReservationRepository) {}
 
-  async execute(reservationId: string, locataireId: string, motif?: string) {
+  async execute(reservationId: string, locataireId: string, _motif?: string) {
     const reservation = await this.reservationRepository.findById(reservationId);
 
     if (!reservation) {

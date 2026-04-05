@@ -21,7 +21,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const authService = new SupabaseAuthService();
 
     // Inscription via Supabase Auth
-    const { user, session, error } = await authService.signUp({
+    const { user, error } = await authService.signUp({
       email: data.email,
       password: data.password,
       nom: data.nom,

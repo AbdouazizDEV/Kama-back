@@ -1,4 +1,4 @@
-import { IAnnonceRepository } from '@/core/domain/repositories/IAnnonceRepository';
+import { IAnnonceRepository, SearchCriteria } from '@/core/domain/repositories/IAnnonceRepository';
 import { IFavoriRepository } from '@/core/domain/repositories/IFavoriRepository';
 import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
 
@@ -41,19 +41,14 @@ export class GetRecommandationsUseCase {
     const typeBienPrefere = this.getMostFrequent(typesBienPreferees);
 
     // Rechercher des annonces similaires
-    const criteria: any = {
-      isPublic: true,
+    const criteria: SearchCriteria = {
+      page: 1,
       limit,
       sortBy: 'nombreVues',
-      sortOrder: 'desc' as const,
+      sortOrder: 'desc',
+      ville: villePreferee ?? undefined,
+      typeBien: typeBienPrefere ?? undefined,
     };
-
-    if (villePreferee) {
-      criteria.ville = villePreferee;
-    }
-    if (typeBienPrefere) {
-      criteria.typeBien = typeBienPrefere;
-    }
 
     const result = await this.annonceRepository.search(criteria);
 

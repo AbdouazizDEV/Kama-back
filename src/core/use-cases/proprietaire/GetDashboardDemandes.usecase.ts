@@ -1,6 +1,7 @@
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
 import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
 import { IAnnonceRepository } from '@/core/domain/repositories/IAnnonceRepository';
+import type { Reservation } from '@/core/domain/entities/Reservation.entity';
 import { ApiError } from '@/shared/utils/ApiError';
 import { UserType } from '@/core/domain/entities/User.entity';
 import { StatutReservation } from '@/shared/constants/statuses.constant';
@@ -64,7 +65,7 @@ export class GetDashboardDemandesProprietaireUseCase {
     };
   }
 
-  private calculerPriorite(reservation: any): 'haute' | 'moyenne' | 'basse' {
+  private calculerPriorite(reservation: Reservation): 'haute' | 'moyenne' | 'basse' {
     const joursAvantDebut = Math.ceil(
       (reservation.dateDebut.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
     );

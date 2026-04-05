@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, AuthenticatedRequest } from '@/presentation/middlewares/auth.middleware';
-import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
 import { SupabaseReservationRepository } from '@/infrastructure/database/repositories/SupabaseReservationRepository';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';

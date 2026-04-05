@@ -4,6 +4,7 @@ import { SuspendUserUseCase } from '@/core/use-cases/admin/SuspendUser.usecase';
 import { SupabaseUserRepository } from '@/infrastructure/database/repositories/SupabaseUserRepository';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 import { handleError } from '@/presentation/middlewares/error.middleware';
+import { suspendUserSchema } from '@/presentation/validators/admin.validator';
 
 const userRepository = new SupabaseUserRepository();
 const suspendUserUseCase = new SuspendUserUseCase(userRepository);

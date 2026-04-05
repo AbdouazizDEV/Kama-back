@@ -1,4 +1,5 @@
-import { IUserRepository, UserFilters } from '@/core/domain/repositories/IUserRepository';
+import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
+import type { User } from '@/core/domain/entities/User.entity';
 
 export interface UserStatistics {
   total: number;
@@ -54,7 +55,7 @@ export class GetUserStatisticsUseCase {
     };
   }
 
-  private groupByMonth(users: any[]): Array<{ mois: string; count: number }> {
+  private groupByMonth(users: User[]): Array<{ mois: string; count: number }> {
     const grouped = new Map<string, number>();
 
     users.forEach((user) => {

@@ -1,4 +1,5 @@
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
+import type { User } from '@/core/domain/entities/User.entity';
 
 export interface UsersReport {
   total: number;
@@ -60,7 +61,7 @@ export class GetUsersReportUseCase {
     };
   }
 
-  private groupInscriptionsByMonth(users: any[]): Array<{ mois: string; count: number }> {
+  private groupInscriptionsByMonth(users: User[]): Array<{ mois: string; count: number }> {
     const grouped = new Map<string, number>();
 
     users.forEach((user) => {
@@ -74,7 +75,7 @@ export class GetUsersReportUseCase {
       .sort((a, b) => a.mois.localeCompare(b.mois));
   }
 
-  private groupActivityByMonth(users: any[]): Array<{ mois: string; nouveaux: number; actifs: number }> {
+  private groupActivityByMonth(users: User[]): Array<{ mois: string; nouveaux: number; actifs: number }> {
     const grouped = new Map<string, { nouveaux: number; actifs: number }>();
 
     users.forEach((user) => {

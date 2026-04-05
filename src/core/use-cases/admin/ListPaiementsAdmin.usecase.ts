@@ -1,7 +1,6 @@
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
 import { Paiement } from '@/core/domain/entities/Paiement.entity';
 import { validatePaginationParams, calculatePagination } from '@/shared/utils/pagination';
-import { StatutPaiement } from '@/shared/constants/statuses.constant';
 
 export interface ListPaiementsAdminInput {
   page?: number;

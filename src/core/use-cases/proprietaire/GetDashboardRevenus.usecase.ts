@@ -1,5 +1,6 @@
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
+import type { Paiement } from '@/core/domain/entities/Paiement.entity';
 import { ApiError } from '@/shared/utils/ApiError';
 import { UserType } from '@/core/domain/entities/User.entity';
 import { StatutPaiement } from '@/shared/constants/statuses.constant';
@@ -29,7 +30,7 @@ export class GetDashboardRevenusProprietaireUseCase {
     }
   }
 
-  private genererDonneesMensuelles(paiements: any[]) {
+  private genererDonneesMensuelles(paiements: Paiement[]) {
     const maintenant = new Date();
     const donnees: Record<string, number> = {};
 
@@ -56,7 +57,7 @@ export class GetDashboardRevenusProprietaireUseCase {
     };
   }
 
-  private genererDonneesAnnuelles(paiements: any[]) {
+  private genererDonneesAnnuelles(paiements: Paiement[]) {
     const maintenant = new Date();
     const donnees: Record<string, number> = {};
 

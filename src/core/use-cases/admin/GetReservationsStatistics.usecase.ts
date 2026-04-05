@@ -1,4 +1,5 @@
 import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
+import { Reservation } from '@/core/domain/entities/Reservation.entity';
 import { StatutReservation } from '@/shared/constants/statuses.constant';
 
 export interface ReservationsStatistics {
@@ -57,7 +58,7 @@ export class GetReservationsStatisticsUseCase {
     };
   }
 
-  private groupByMonth(reservations: any[]): Array<{ mois: string; count: number }> {
+  private groupByMonth(reservations: Reservation[]): Array<{ mois: string; count: number }> {
     const grouped = new Map<string, number>();
 
     reservations.forEach((reservation) => {

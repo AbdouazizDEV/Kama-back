@@ -1,5 +1,6 @@
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
+import type { Paiement } from '@/core/domain/entities/Paiement.entity';
 import { ApiError } from '@/shared/utils/ApiError';
 import { UserType } from '@/core/domain/entities/User.entity';
 import { StatutPaiement } from '@/shared/constants/statuses.constant';
@@ -43,7 +44,7 @@ export class GetStatistiquesPaiementsProprietaireUseCase {
     };
   }
 
-  private calculerRevenusMensuel(paiements: any[]): number {
+  private calculerRevenusMensuel(paiements: Paiement[]): number {
     const maintenant = new Date();
     const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1);
     return paiements
@@ -51,7 +52,7 @@ export class GetStatistiquesPaiementsProprietaireUseCase {
       .reduce((sum, p) => sum + p.montant.getMontant(), 0);
   }
 
-  private calculerRevenusAnnuel(paiements: any[]): number {
+  private calculerRevenusAnnuel(paiements: Paiement[]): number {
     const maintenant = new Date();
     const debutAnnee = new Date(maintenant.getFullYear(), 0, 1);
     return paiements
@@ -59,7 +60,7 @@ export class GetStatistiquesPaiementsProprietaireUseCase {
       .reduce((sum, p) => sum + p.montant.getMontant(), 0);
   }
 
-  private grouperParMethode(paiements: any[]): Record<string, number> {
+  private grouperParMethode(paiements: Paiement[]): Record<string, number> {
     const groupes: Record<string, number> = {};
     paiements.forEach((p) => {
       groupes[p.methodePaiement] = (groupes[p.methodePaiement] || 0) + p.montant.getMontant();

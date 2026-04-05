@@ -6,6 +6,8 @@ import { ApiError } from '@/shared/utils/ApiError';
 import { logger } from '@/shared/utils/logger';
 import { supabase } from '@/config/supabase.config';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Endpoint de callback pour la vérification d'email
  * Appelé depuis le frontend après la redirection Supabase
@@ -16,8 +18,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const searchParams = request.nextUrl.searchParams;
     const accessToken = searchParams.get('access_token');
-    const type = searchParams.get('type') || 'signup';
-
     if (!accessToken) {
       throw ApiError.badRequest('Access token manquant');
     }

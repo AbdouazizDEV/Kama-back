@@ -1,6 +1,5 @@
 import { ILitigeRepository } from '@/core/domain/repositories/ILitigeRepository';
 import { ApiError } from '@/shared/utils/ApiError';
-import { StatutLitige } from '@/core/domain/entities/Litige.entity';
 
 export interface ResolveLitigeInput {
   litigeId: string;

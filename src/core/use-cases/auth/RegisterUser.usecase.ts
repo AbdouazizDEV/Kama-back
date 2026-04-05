@@ -1,6 +1,9 @@
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { IEmailService } from '../../domain/services/IEmailService';
 import { User, UserType } from '../../domain/entities/User.entity';
+import { Locataire } from '../../domain/entities/Locataire.entity';
+import { Proprietaire } from '../../domain/entities/Proprietaire.entity';
+import { Etudiant } from '../../domain/entities/Etudiant.entity';
 import { Email } from '../../domain/value-objects/Email.vo';
 import { Password } from '../../domain/value-objects/Password.vo';
 import { ApiError } from '@/shared/utils/ApiError';
@@ -32,20 +35,61 @@ export class RegisterUserUseCase {
       throw ApiError.conflict('Cet email est déjà utilisé');
     }
 
-    // Créer l'utilisateur
-    const user = new User(
-      randomUUID(),
-      email,
-      password,
-      input.nom,
-      input.prenom,
-      input.telephone,
-      null,
-      new Date(),
-      true,
-      false,
-      input.typeUtilisateur
-    );
+    // Créer l'utilisateur (User est abstrait — instancier la sous-classe selon le type)
+    const id = randomUUID();
+    const dateInscription = new Date();
+    let user: User;
+
+    switch (input.typeUtilisateur) {
+      case UserType.LOCATAIRE:
+        user = new Locataire(
+          id,
+          email,
+          password,
+          input.nom,
+          input.prenom,
+          input.telephone,
+          null,
+          dateInscription,
+          true,
+          false
+        );
+        break;
+      case UserType.PROPRIETAIRE:
+        user = new Proprietaire(
+          id,
+          email,
+          password,
+          input.nom,
+          input.prenom,
+          input.telephone,
+          null,
+          dateInscription,
+          true,
+          false
+        );
+        break;
+      case UserType.ETUDIANT:
+        user = new Etudiant(
+          id,
+          email,
+          password,
+          input.nom,
+          input.prenom,
+          input.telephone,
+          null,
+          dateInscription,
+          true,
+          false
+        );
+        break;
+      case UserType.ADMIN:
+        throw ApiError.badRequest('Création de compte administrateur non autorisée via inscription');
+      default: {
+        const _n: never = input.typeUtilisateur;
+        throw new Error(`Type utilisateur non géré: ${_n}`);
+      }
+    }
 
     // Sauvegarder
     await this.userRepository.save(user);

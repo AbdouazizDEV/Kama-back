@@ -51,15 +51,19 @@ export class Etudiant extends Locataire {
   }
 
   updateUniversite(universite: string, filiere: string, niveauEtude: string): void {
+    /* eslint-disable @typescript-eslint/no-explicit-any -- readonly fields mutated post-construction */
     (this as any).universite = universite;
     (this as any).filiere = filiere;
     (this as any).niveauEtude = niveauEtude;
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }
 
   uploadDocuments(carteEtudianteUrl: string, attestationInscriptionUrl: string): void {
+    /* eslint-disable @typescript-eslint/no-explicit-any -- readonly fields mutated post-construction */
     (this as any).carteEtudianteUrl = carteEtudianteUrl;
     (this as any).attestationInscriptionUrl = attestationInscriptionUrl;
     (this as any).statutVerification = StatutVerificationEtudiant.EN_ATTENTE;
+    /* eslint-enable @typescript-eslint/no-explicit-any */
   }
 
   isVerified(): boolean {

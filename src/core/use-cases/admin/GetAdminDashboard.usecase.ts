@@ -1,5 +1,5 @@
 import { IUserRepository } from '@/core/domain/repositories/IUserRepository';
-import { IAnnonceRepository, SearchCriteria } from '@/core/domain/repositories/IAnnonceRepository';
+import { IAnnonceRepository } from '@/core/domain/repositories/IAnnonceRepository';
 import { IReservationRepository } from '@/core/domain/repositories/IReservationRepository';
 import { IPaiementRepository } from '@/core/domain/repositories/IPaiementRepository';
 import { StatutModeration } from '@/shared/constants/statuses.constant';

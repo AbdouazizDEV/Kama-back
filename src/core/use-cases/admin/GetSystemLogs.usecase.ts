@@ -5,7 +5,7 @@ export interface SystemLog {
   level: 'error' | 'warn' | 'info' | 'debug';
   message: string;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface GetSystemLogsInput {

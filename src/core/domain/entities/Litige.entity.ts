@@ -20,7 +20,7 @@ export class Litige {
     public readonly proprietaireId: string,
     public readonly type: TypeLitige,
     public readonly description: string,
-    public readonly statut: StatutLitige,
+    public statut: StatutLitige,
     public readonly dateCreation: Date,
     public dateModification: Date,
     public resolution: string | null = null,
